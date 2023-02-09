@@ -2,6 +2,8 @@ package net.jandie1505.bungeeaccesscontrol;
 
 import net.jandie1505.bungeeaccesscontrol.config.ConfigManager;
 import net.jandie1505.bungeeaccesscontrol.config.DefaultConfigValues;
+import net.jandie1505.bungeeaccesscontrol.database.DatabaseManager;
+import net.jandie1505.bungeeaccesscontrol.database.managers.MySQLDatabaseManager;
 import net.md_5.bungee.api.plugin.Plugin;
 
 public class AccessControl extends Plugin {
@@ -10,6 +12,7 @@ public class AccessControl extends Plugin {
     // PLUGIN
 
     private ConfigManager configManager;
+    private DatabaseManager databaseManager;
     private boolean lockdown;
 
     @Override
@@ -17,6 +20,7 @@ public class AccessControl extends Plugin {
         this.lockdown = false;
 
         this.configManager = new ConfigManager(this, DefaultConfigValues.getConfig(), "config.json");
+        this.databaseManager = new MySQLDatabaseManager(this);
 
         accessControl = this;
     }
@@ -31,6 +35,10 @@ public class AccessControl extends Plugin {
 
     public ConfigManager getConfigManager() {
         return this.configManager;
+    }
+
+    public DatabaseManager getDatabaseManager() {
+        return this.databaseManager;
     }
 
     // STATIC
