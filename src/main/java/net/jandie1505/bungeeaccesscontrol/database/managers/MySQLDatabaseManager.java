@@ -5,9 +5,8 @@ import net.jandie1505.bungeeaccesscontrol.database.DatabaseManager;
 import net.jandie1505.bungeeaccesscontrol.database.data.BanData;
 import org.json.JSONObject;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -42,7 +41,6 @@ public class MySQLDatabaseManager implements DatabaseManager {
                     "CREATE TABLE IF NOT EXISTS bans (" +
                             "id PRIMARY KEY BIGINT NOT NULL AUTOINCREMENT," +
                             "player VARCHAR(255) NOT NULL," +
-                            "startTime BIGINT," +
                             "endTime BIGINT," +
                             "reason VARCHAR(255)," +
                             "cancelled BOOLEAN NOT NULL DEFAULT false" +
@@ -59,38 +57,193 @@ public class MySQLDatabaseManager implements DatabaseManager {
         this.accessControl.getLogger().warning("MySQL Exception: EXCEPTION=" + e + ";STACKTRACE=" + Arrays.toString(e.getStackTrace()) + ";MESSAGE=" + e.getMessage() + ";");
     }
 
+    private List<BanData> createBanData(ResultSet rs) throws SQLException {
+        List<BanData> returnList = new ArrayList<>();
+
+        while (rs.next()) {
+            long id = rs.getLong("id");
+            UUID player = UUID.fromString(rs.getString("player"));
+
+            Long endTime = rs.getLong("endTime");
+
+            if (rs.wasNull()) {
+                endTime = null;
+            }
+
+            String reason = null;
+
+            if (rs.getString("reason") != null) {
+                reason = rs.getString("reason");
+            }
+
+            boolean cancelled = rs.getBoolean("cancelled");
+
+            String additional = null;
+
+            if (rs.getString("additional") != null) {
+                additional = rs.getString("additional");
+            }
+
+            returnList.add(new BanData(id, player, endTime, reason, cancelled, additional));
+        }
+
+        return List.copyOf(returnList);
+    }
+
     @Override
     public List<BanData> getBans() {
-        return null;
+        try {
+            return this.createBanData(this.connection.prepareStatement("SELECT * FROM bans;").executeQuery());
+        } catch (SQLException e) {
+            this.errorHandler(e);
+        }
+
+        return List.of();
     }
 
     @Override
     public List<BanData> getBans(UUID uuid) {
-        return null;
+        try {
+            PreparedStatement statement = this.connection.prepareStatement("SELECT * FROM bans WHERE player = ?;");
+            statement.setString(1, uuid.toString());
+            return this.createBanData(statement.executeQuery());
+        } catch (SQLException e) {
+            this.errorHandler(e);
+        }
+
+        return List.of();
     }
 
     @Override
     public BanData getBan(long id) {
+        List<BanData> returnList = new ArrayList<>();
+
+        try {
+            PreparedStatement statement = this.connection.prepareStatement("SELECT * FROM bans WHERE id = ?;");
+            statement.setLong(1, id);
+            returnList.addAll(this.createBanData(statement.executeQuery()));
+        } catch (SQLException e) {
+            this.errorHandler(e);
+        }
+
+        if (!returnList.isEmpty()) {
+            return returnList.get(0);
+        }
+
         return null;
     }
 
     @Override
-    public long addBan(UUID player, Long endTime, String reason, String additional) {
-        return 0;
+    public long addBan(UUID player, Long endTime, String reason, boolean cancelled, String additional) {
+        try {
+            PreparedStatement statement = this.connection.prepareStatement(
+                    "INSERT INTO bans (player, endTime, reason, additional)" +
+                            "VALUES (?, ?, ?, ?);",
+                    Statement.RETURN_GENERATED_KEYS
+            );
+
+            if (player == null) {
+                return -1;
+            }
+
+            statement.setString(1, player.toString());
+
+            if (endTime != null) {
+                statement.setLong(2, endTime);
+            } else {
+                statement.setNull(2, Types.BIGINT);
+            }
+
+            if (reason != null) {
+                statement.setString(3, reason);
+            } else {
+                statement.setNull(3, Types.VARCHAR);
+            }
+
+            if (additional != null) {
+                statement.setString(4, additional);
+            } else {
+                statement.setNull(4, Types.VARCHAR);
+            }
+
+            if (statement.executeUpdate() != 0) {
+                ResultSet rs = statement.getGeneratedKeys();
+                return rs.getLong(1);
+            } else {
+                return -1;
+            }
+        } catch (SQLException e) {
+            this.errorHandler(e);
+            return -1;
+        }
     }
 
     @Override
     public boolean deleteBan(long id) {
-        return false;
+        try {
+            PreparedStatement statement = this.connection.prepareStatement("DELETE FROM bans WHERE id = ?;");
+            statement.setLong(1, id);
+            return statement.executeUpdate() != 0;
+        } catch (Exception e) {
+            this.errorHandler(e);
+            return false;
+        }
     }
 
     @Override
-    public boolean clearBans(UUID player) {
-        return false;
+    public boolean clearBans(UUID uuid) {
+        try {
+            PreparedStatement statement = connection.prepareStatement("DELETE FROM bans WHERE player = ?");
+            statement.setString(1, uuid.toString());
+            return statement.executeUpdate() != 0;
+        } catch (SQLException e) {
+            this.errorHandler(e);
+            return false;
+        }
     }
 
     @Override
     public boolean editBan(BanData banData) {
-        return false;
+        try {
+            PreparedStatement statement = connection.prepareStatement(
+                    "UPDATE bans" +
+                            "SET player = ?, endTime = ?, reason = ?, cancelled = ?, additional = ?" +
+                            "WHERE id = ?" +
+                            ";"
+            );
+
+            if (banData.getPlayer() == null) {
+                return false;
+            }
+
+            statement.setString(1, banData.getPlayer().toString());
+
+            if (banData.getEndTime() != null) {
+                statement.setLong(2, banData.getEndTime());
+            } else {
+                statement.setNull(2, Types.BIGINT);
+            }
+
+            if (banData.getReason() != null) {
+                statement.setString(3, banData.getReason());
+            } else {
+                statement.setNull(3, Types.VARCHAR);
+            }
+
+            statement.setBoolean(4, banData.isCancelled());
+
+            if (banData.getAdditional() != null) {
+                statement.setString(5, banData.getAdditional());
+            } else {
+                statement.setNull(5, Types.VARCHAR);
+            }
+
+            statement.setLong(6, banData.getId());
+
+            return statement.executeUpdate() != 0;
+        } catch (SQLException e) {
+            this.errorHandler(e);
+            return false;
+        }
     }
 }
