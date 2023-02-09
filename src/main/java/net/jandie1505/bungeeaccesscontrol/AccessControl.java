@@ -1,4 +1,4 @@
-package net.jandie1505.bac;
+package net.jandie1505.bungeeaccesscontrol;
 
 import net.md_5.bungee.api.plugin.Plugin;
 
