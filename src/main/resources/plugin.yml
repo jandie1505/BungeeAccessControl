@@ -1,0 +1,6 @@
+name: BungeeSystem
+main: net.jandie1505.bungeeaccesscontrol.AccessControl
+version: 1.0
+author: jandie1505
+website: jandie1505.net
+load: STARTUP
