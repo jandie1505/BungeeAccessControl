@@ -14,10 +14,12 @@ public class AccessControl extends Plugin {
     private ConfigManager configManager;
     private DatabaseManager databaseManager;
     private boolean lockdown;
+    private boolean maintenance;
 
     @Override
     public void onEnable() {
         this.lockdown = false;
+        this.maintenance = false;
 
         this.configManager = new ConfigManager(this, DefaultConfigValues.getConfig(), "config.json");
         this.databaseManager = new MySQLDatabaseManager(this);
@@ -31,6 +33,14 @@ public class AccessControl extends Plugin {
 
     public void setLockdown(boolean lockdown) {
         this.lockdown = lockdown;
+    }
+
+    public boolean isMaintenance() {
+        return maintenance;
+    }
+
+    public void setMaintenance(boolean maintenance) {
+        this.maintenance = maintenance;
     }
 
     public ConfigManager getConfigManager() {

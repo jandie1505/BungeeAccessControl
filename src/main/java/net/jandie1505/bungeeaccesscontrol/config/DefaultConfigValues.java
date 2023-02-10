@@ -19,9 +19,16 @@ public final class DefaultConfigValues {
 
         JSONObject disconnectScreensConfig = new JSONObject();
         disconnectScreensConfig.put("lockdown", "This network is currently under lockdown");
+        disconnectScreensConfig.put("maintenance", "This network is currently under maintenance");
         disconnectScreensConfig.put("bannedPermanently", "You are permanently banned!\nReason: {reason}");
         disconnectScreensConfig.put("bannedTemporary", "You are temporarily banned!\nReason: {reason}\nUntil: {until}");
         config.put("disconnectScreens", disconnectScreensConfig);
+
+        JSONObject permissionsConfig = new JSONObject();
+        permissionsConfig.put("bypassLockdown", "accesscontrol.lockdown");
+        permissionsConfig.put("bypassMaintenance", "accesscontrol.maintenance");
+        permissionsConfig.put("unbannable", "accesscontrol.unbannable");
+        config.put("permissions", permissionsConfig);
 
         return config;
     }
