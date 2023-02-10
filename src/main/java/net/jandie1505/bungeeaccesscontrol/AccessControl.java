@@ -55,6 +55,10 @@ public class AccessControl extends Plugin {
         return this.databaseManager;
     }
 
+    public BanManager getBanManager() {
+        return this.banManager;
+    }
+
     // STATIC
 
     public static AccessControl getInstance() {

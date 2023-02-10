@@ -1,13 +1,11 @@
 package net.jandie1505.bungeeaccesscontrol.managers.data;
 
-import net.jandie1505.bungeeaccesscontrol.database.data.BanData;
-import net.md_5.bungee.api.plugin.Plugin;
 import org.json.JSONObject;
 
 import java.time.Instant;
 import java.util.UUID;
 
-public class Ban {
+public class Ban implements Comparable<Ban> {
     private final long id;
     private UUID player;
     private Long endTime;
@@ -82,5 +80,18 @@ public class Ban {
      */
     public boolean isActive() {
         return !this.cancelled && (this.endTime == null || this.endTime > Instant.now().getEpochSecond());
+    }
+
+    @Override
+    public int compareTo(Ban o) {
+        if (this.getEndTime() == null) {
+            return 1;
+        }
+
+        if (o.getEndTime() == null) {
+            return -1;
+        }
+
+        return this.getEndTime().compareTo(o.getEndTime());
     }
 }

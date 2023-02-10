@@ -20,8 +20,7 @@ public final class DefaultConfigValues {
         JSONObject disconnectScreensConfig = new JSONObject();
         disconnectScreensConfig.put("lockdown", "This network is currently under lockdown");
         disconnectScreensConfig.put("maintenance", "This network is currently under maintenance");
-        disconnectScreensConfig.put("bannedPermanently", "You are permanently banned!\nReason: {reason}");
-        disconnectScreensConfig.put("bannedTemporary", "You are temporarily banned!\nReason: {reason}\nUntil: {until}");
+        disconnectScreensConfig.put("banned", "You are permanently banned!\nReason: {reason}\nUntil: {until}\nDuration: {duration}");
         config.put("disconnectScreens", disconnectScreensConfig);
 
         JSONObject permissionsConfig = new JSONObject();
@@ -29,6 +28,14 @@ public final class DefaultConfigValues {
         permissionsConfig.put("bypassMaintenance", "accesscontrol.maintenance");
         permissionsConfig.put("unbannable", "accesscontrol.unbannable");
         config.put("permissions", permissionsConfig);
+
+        JSONObject dateTimeConfig = new JSONObject();
+        dateTimeConfig.put("datetime", "dd.MM.yyyy HH:mm:ss");
+        dateTimeConfig.put("time", "HH:mm:ss");
+        dateTimeConfig.put("date", "dd.MM.yyyy");
+        dateTimeConfig.put("remaining", "{days}d, {hours}h, {minutes}m, {seconds}s");
+        dateTimeConfig.put("permanentTime", "PERMANENT");
+        config.put("dateTime", dateTimeConfig);
 
         return config;
     }
