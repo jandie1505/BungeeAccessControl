@@ -43,7 +43,7 @@ public class MySQLDatabaseManager implements DatabaseManager {
                             "player VARCHAR(255) NOT NULL," +
                             "endTime BIGINT," +
                             "reason VARCHAR(255)," +
-                            "cancelled BOOLEAN NOT NULL DEFAULT false" +
+                            "cancelled BOOLEAN NOT NULL DEFAULT false," +
                             "additional VARCHAR(1000)" +
                             ");"
             ).execute();
@@ -134,7 +134,7 @@ public class MySQLDatabaseManager implements DatabaseManager {
     }
 
     @Override
-    public long addBan(UUID player, Long endTime, String reason, boolean cancelled, String additional) {
+    public long addBan(UUID player, Long endTime, String reason, String additional) {
         try {
             PreparedStatement statement = this.connection.prepareStatement(
                     "INSERT INTO bans (player, endTime, reason, additional)" +

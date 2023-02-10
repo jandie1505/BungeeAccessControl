@@ -44,6 +44,10 @@ public class BanData {
         return additional;
     }
 
+    public void setPlayer(UUID player) {
+        this.player = player;
+    }
+
     public void setEndTime(Long endTime) {
         this.endTime = endTime;
     }

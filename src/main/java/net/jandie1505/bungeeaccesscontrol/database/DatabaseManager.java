@@ -11,7 +11,7 @@ public interface DatabaseManager {
 
     BanData getBan(long id);
 
-    long addBan(UUID player, Long endTime, String reason, boolean cancelled, String additional);
+    long addBan(UUID player, Long endTime, String reason, String additional);
 
     boolean deleteBan(long id);
 
