@@ -1,5 +1,6 @@
 package net.jandie1505.bungeeaccesscontrol.config;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 public final class DefaultConfigValues {
@@ -24,8 +25,8 @@ public final class DefaultConfigValues {
         config.put("disconnectScreens", disconnectScreensConfig);
 
         JSONObject permissionsConfig = new JSONObject();
-        permissionsConfig.put("bypassLockdown", "accesscontrol.lockdown");
-        permissionsConfig.put("bypassMaintenance", "accesscontrol.maintenance");
+        permissionsConfig.put("bypassLockdown", "accesscontrol.bypass.lockdown");
+        permissionsConfig.put("bypassMaintenance", "accesscontrol.bypass.maintenance");
         permissionsConfig.put("unbannable", "accesscontrol.unbannable");
         config.put("permissions", permissionsConfig);
 
@@ -36,6 +37,20 @@ public final class DefaultConfigValues {
         dateTimeConfig.put("remaining", "{days}d, {hours}h, {minutes}m, {seconds}s");
         dateTimeConfig.put("permanentTime", "PERMANENT");
         config.put("dateTime", dateTimeConfig);
+
+        JSONObject commandConfig = new JSONObject();
+        commandConfig.put("command", "accesscontrol");
+        JSONArray accessControlAliasesCommandConfig = new JSONArray();
+        accessControlAliasesCommandConfig.put("ac");
+        accessControlAliasesCommandConfig.put("bungeeaccesscontrol");
+        commandConfig.put("aliases", accessControlAliasesCommandConfig);
+        JSONObject permissionAccessControlCommandConfig = new JSONObject();
+        permissionAccessControlCommandConfig.put("base", "accesscontrol.command");
+        permissionAccessControlCommandConfig.put("ban", "accesscontrol.command.ban");
+        permissionAccessControlCommandConfig.put("kick", "accesscontrol.command.kick");
+        permissionAccessControlCommandConfig.put("maintenance", "accesscontrol.command.maintenance");
+        permissionAccessControlCommandConfig.put("lockdown", "accesscontrol.command.lockdown");
+        commandConfig.put("command", commandConfig);
 
         return config;
     }

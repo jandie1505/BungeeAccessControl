@@ -1,9 +1,14 @@
 package net.jandie1505.bungeeaccesscontrol.utilities;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -37,5 +42,23 @@ public class Utilities {
         timeString = timeString.replace("{seconds}", String.valueOf(seconds));
 
         return timeString;
+    }
+
+    public static String[] aliases(JSONObject jsonObject) {
+        JSONArray jsonArray = jsonObject.optJSONArray("aliases");
+
+        if (jsonArray == null) {
+            return new String[]{};
+        }
+
+        List<String> aliasesList = new ArrayList<>();
+
+        for (Object object : jsonArray) {
+            if (object instanceof String) {
+                aliasesList.add((String) object);
+            }
+        }
+
+        return aliasesList.toArray(new String[0]);
     }
 }

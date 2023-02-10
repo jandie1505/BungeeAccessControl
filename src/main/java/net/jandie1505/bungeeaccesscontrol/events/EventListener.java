@@ -25,11 +25,11 @@ public class EventListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPostLogin(PostLoginEvent event) {
-        if (this.accessControl.isLockdown() && !event.getPlayer().hasPermission(this.accessControl.getConfigManager().getConfig().optJSONObject("permissions", new JSONObject()).optString("bypassLockdown", "accesscontrol.lockdown"))) {
+        if (this.accessControl.isLockdown() && !event.getPlayer().hasPermission(this.accessControl.getConfigManager().getConfig().optJSONObject("permissions", new JSONObject()).optString("bypassLockdown", "accesscontrol.bypass.lockdown"))) {
             event.getPlayer().disconnect(this.accessControl.getConfigManager().getConfig().optJSONObject("disconnectScreens", new JSONObject()).optString("lockdown", "This network is currently under lockdown"));
         }
 
-        if (this.accessControl.isMaintenance() && !event.getPlayer().hasPermission(this.accessControl.getConfigManager().getConfig().optJSONObject("permissions", new JSONObject()).optString("bypassMaintenance", "accesscontrol.maintenance"))) {
+        if (this.accessControl.isMaintenance() && !event.getPlayer().hasPermission(this.accessControl.getConfigManager().getConfig().optJSONObject("permissions", new JSONObject()).optString("bypassMaintenance", "accesscontrol.bypass.maintenance"))) {
             event.getPlayer().disconnect(this.accessControl.getConfigManager().getConfig().optJSONObject("disconnectScreens", new JSONObject()).optString("lockdown", "This network is currently under maintenance"));
         }
 
