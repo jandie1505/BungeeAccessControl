@@ -21,7 +21,7 @@ public final class DefaultConfigValues {
         JSONObject disconnectScreensConfig = new JSONObject();
         disconnectScreensConfig.put("lockdown", "This network is currently under lockdown");
         disconnectScreensConfig.put("maintenance", "This network is currently under maintenance");
-        disconnectScreensConfig.put("banned", "You are permanently banned!\nReason: {reason}\nUntil: {until}\nDuration: {duration}");
+        disconnectScreensConfig.put("banned", "You are permanently banned!\\nReason: {reason}\\nUntil: {until}\\nDuration: {duration}");
         config.put("disconnectScreens", disconnectScreensConfig);
 
         JSONObject permissionsConfig = new JSONObject();
@@ -50,7 +50,13 @@ public final class DefaultConfigValues {
         permissionAccessControlCommandConfig.put("kick", "accesscontrol.command.kick");
         permissionAccessControlCommandConfig.put("maintenance", "accesscontrol.command.maintenance");
         permissionAccessControlCommandConfig.put("lockdown", "accesscontrol.command.lockdown");
-        commandConfig.put("command", commandConfig);
+        commandConfig.put("permissions", permissionAccessControlCommandConfig);
+        config.put("command", commandConfig);
+
+        JSONObject messagesConfig = new JSONObject();
+        messagesConfig.put("noPermission", "No permission!");
+        messagesConfig.put("unknownCommandUsage", "Unknown command usage. Use /ac help for help.");
+        config.put("messages", messagesConfig);
 
         return config;
     }

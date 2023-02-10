@@ -25,13 +25,63 @@ public class ACCommand extends Command implements TabExecutor {
     }
 
     @Override
-    public void execute(CommandSender commandSender, String[] args) {
+    public void execute(CommandSender sender, String[] args) {
+        if (!sender.hasPermission(accessControl.getConfigManager().getConfig().optJSONObject("command", new JSONObject()).optJSONObject("permissions", new JSONObject()).optString("permission", "accesscontrol.command"))) {
+            return;
+        }
+
+        if (args.length >= 1) {
+
+            switch (args[0]) {
+                case "ban":
+                    this.banSubcommand(sender, args);
+                    break;
+                case "kick":
+                    this.kickSubcommand(sender, args);
+                    break;
+                case "maintenance":
+                    this.maintenanceSubcommand(sender, args);
+                    break;
+                case "lockdown":
+                    this.lockdownSubcommand(sender, args);
+                    break;
+                case "help":
+                    this.helpSubcommand(sender, args);
+                    break;
+                default:
+                    break;
+            }
+
+        } else {
+            sender.sendMessage(accessControl.getConfigManager().getConfig().optJSONObject("unknownCommandUsage", new JSONObject()).optString("unknownCommandUsage", "Unknown command usage. Use /ac help for help."));
+        }
+    }
+
+    private void banSubcommand(CommandSender sender, String[] args) {
+        if (!sender.hasPermission(accessControl.getConfigManager().getConfig().optJSONObject("command", new JSONObject()).optJSONObject("permissions", new JSONObject()).optString("permission", "accesscontrol.command.ban"))) {
+            return;
+        }
+    }
+
+    private void kickSubcommand(CommandSender sender, String[] args) {
+
+    }
+
+    private void maintenanceSubcommand(CommandSender sender, String[] args) {
+
+    }
+
+    private void lockdownSubcommand(CommandSender sender, String[] args) {
+
+    }
+
+    private void helpSubcommand(CommandSender sender, String[] args) {
 
     }
 
     @Override
     public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
-        if (sender instanceof ProxiedPlayer && !sender.hasPermission(accessControl.getConfigManager().getConfig().optJSONObject("command", new JSONObject()).optString("permission", "accesscontrol.command"))) {
+        if (sender instanceof ProxiedPlayer && !sender.hasPermission(accessControl.getConfigManager().getConfig().optJSONObject("command", new JSONObject()).optJSONObject("permissions", new JSONObject()).optString("permission", "accesscontrol.command"))) {
             return List.of();
         }
 
@@ -106,6 +156,7 @@ public class ACCommand extends Command implements TabExecutor {
             tabCompletions.add("kick");
             tabCompletions.add("maintenance");
             tabCompletions.add("lockdown");
+            tabCompletions.add("help");
 
         }
 
