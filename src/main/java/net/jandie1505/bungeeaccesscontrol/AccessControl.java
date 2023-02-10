@@ -4,6 +4,8 @@ import net.jandie1505.bungeeaccesscontrol.config.ConfigManager;
 import net.jandie1505.bungeeaccesscontrol.config.DefaultConfigValues;
 import net.jandie1505.bungeeaccesscontrol.database.DatabaseManager;
 import net.jandie1505.bungeeaccesscontrol.database.managers.MySQLDatabaseManager;
+import net.jandie1505.bungeeaccesscontrol.managers.BanManager;
+import net.jandie1505.bungeeaccesscontrol.managers.data.Ban;
 import net.md_5.bungee.api.plugin.Plugin;
 
 public class AccessControl extends Plugin {
@@ -13,6 +15,7 @@ public class AccessControl extends Plugin {
 
     private ConfigManager configManager;
     private DatabaseManager databaseManager;
+    private BanManager banManager;
     private boolean lockdown;
     private boolean maintenance;
 
@@ -23,6 +26,7 @@ public class AccessControl extends Plugin {
 
         this.configManager = new ConfigManager(this, DefaultConfigValues.getConfig(), "config.json");
         this.databaseManager = new MySQLDatabaseManager(this);
+        this.banManager = new BanManager(this);
 
         accessControl = this;
     }

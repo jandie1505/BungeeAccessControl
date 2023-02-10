@@ -150,6 +150,39 @@ public class BanManager {
     }
 
     /**
+     * Get all active bans.
+     * @return list of bans
+     */
+    public List<Ban> getActiveBans() {
+        List<Ban> activeBans = new ArrayList<>();
+
+        for (Ban ban : this.getBans()) {
+            if (ban.isActive()) {
+                activeBans.add(ban);
+            }
+        }
+
+        return List.copyOf(activeBans);
+    }
+
+    /**
+     * Get all active bans of a specific player.
+     * @param playerId player UUID
+     * @return list of bans
+     */
+    public List<Ban> getActiveBans(UUID playerId) {
+        List<Ban> activeBans = new ArrayList<>();
+
+        for (Ban ban : this.getBans(playerId)) {
+            if (ban.isActive()) {
+                activeBans.add(ban);
+            }
+        }
+
+        return List.copyOf(activeBans);
+    }
+
+    /**
      * Edit a ban.
      * @param ban ban object
      * @return success

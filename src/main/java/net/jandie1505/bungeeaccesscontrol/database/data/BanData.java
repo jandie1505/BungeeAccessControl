@@ -63,12 +63,4 @@ public class BanData {
     public void setAdditional(String additional) {
         this.additional = additional;
     }
-
-    /**
-     * Returns if a ban is active or not
-     * @return boolean
-     */
-    public boolean isActive() {
-        return !this.cancelled && (this.endTime == null || this.endTime > Instant.now().getEpochSecond());
-    }
 }
