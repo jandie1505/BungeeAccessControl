@@ -1,5 +1,7 @@
 package net.jandie1505.bungeeaccesscontrol.utilities;
 
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.plugin.Plugin;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -10,6 +12,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class Utilities {
@@ -60,5 +63,21 @@ public class Utilities {
         }
 
         return aliasesList.toArray(new String[0]);
+    }
+
+    public static UUID getPlayerIdFromString(Plugin plugin, String player) {
+        UUID playerId = null;
+
+        try {
+            playerId = UUID.fromString(player);
+        } catch (IllegalArgumentException e) {
+            ProxiedPlayer proxiedPlayer = plugin.getProxy().getPlayer(player);
+
+            if (proxiedPlayer != null) {
+                playerId = proxiedPlayer.getUniqueId();
+            }
+        }
+
+        return playerId;
     }
 }
