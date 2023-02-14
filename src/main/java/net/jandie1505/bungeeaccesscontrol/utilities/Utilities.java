@@ -47,6 +47,26 @@ public class Utilities {
         return timeString;
     }
 
+    public static long createTimeFromInput(String input) {
+        try {
+            if (input.length() >= 2) {
+
+                if (input.startsWith("r")) {
+                    return Instant.now().getEpochSecond() + Long.parseLong(input.substring(1));
+                } else if (input.startsWith("a")) {
+                    return Long.parseLong(input.substring(1));
+                } else {
+                    return -1;
+                }
+
+            } else {
+                return -1;
+            }
+        } catch (IllegalArgumentException e) {
+            return -1;
+        }
+    }
+
     public static String[] aliases(JSONObject jsonObject) {
         JSONArray jsonArray = jsonObject.optJSONArray("aliases");
 

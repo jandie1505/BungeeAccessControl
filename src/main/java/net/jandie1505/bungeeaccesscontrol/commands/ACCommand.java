@@ -118,32 +118,7 @@ public class ACCommand extends Command implements TabExecutor {
                                         if (args.length > 3) {
 
                                             String timeString = args[3];
-                                            long time = -1;
-
-                                            try {
-                                                if (timeString.length() >= 2) {
-
-                                                    if (timeString.startsWith("r")) {
-
-                                                        time = Instant.now().getEpochSecond() + Long.parseLong(timeString.substring(1));
-
-                                                    } else if (timeString.startsWith("a")) {
-
-                                                        time = Long.parseLong(timeString.substring(1));
-
-                                                    } else {
-                                                        sender.sendMessage(this.TIME_FORMAT_ERROR);
-                                                        return;
-                                                    }
-
-                                                } else {
-                                                    sender.sendMessage(this.TIME_FORMAT_ERROR);
-                                                    return;
-                                                }
-                                            } catch (IllegalArgumentException e) {
-                                                sender.sendMessage(this.TIME_FORMAT_ERROR);
-                                                return;
-                                            }
+                                            long time = Utilities.createTimeFromInput(timeString);
 
                                             if (time >= 0) {
 
@@ -203,6 +178,75 @@ public class ACCommand extends Command implements TabExecutor {
 
                             } else if (args[1].equalsIgnoreCase("modify")) {
 
+                                if (args.length > 4) {
+
+                                    try {
+
+                                        Ban ban = this.accessControl.getBanManager().getBan(Long.parseLong(args[2]));
+
+                                        if (ban != null) {
+
+                                            if (args[3].equalsIgnoreCase("player")) {
+
+                                                UUID player = Utilities.getPlayerIdFromString(this.accessControl, args[4]);
+
+                                                if (player != null) {
+                                                    ban.setPlayer(player);
+                                                } else {
+                                                    sender.sendMessage("Player not found");
+                                                    return;
+                                                }
+
+                                            } else if (args[3].equalsIgnoreCase("endTime")) {
+
+                                                long time = Utilities.createTimeFromInput(args[4]);
+
+                                                if (time >= 0) {
+                                                    ban.setEndTime(time);
+                                                } else {
+                                                    sender.sendMessage(this.TIME_FORMAT_ERROR);
+                                                    return;
+                                                }
+
+                                            } else if (args[3].equalsIgnoreCase("cancelled")) {
+
+                                                ban.setCancelled(Boolean.parseBoolean(args[4]));
+
+                                            } else if (args[3].equalsIgnoreCase("reason")) {
+
+                                                String reasonString = "";
+
+                                                for (int i = 4; i < args.length; i++) {
+                                                    reasonString = reasonString + args[i];
+                                                }
+
+                                                ban.setReason(reasonString);
+
+                                            } else {
+                                                sender.sendMessage("You can only modify player, endTime, cancelled and reason");
+                                                return;
+                                            }
+
+                                            boolean success = this.accessControl.getBanManager().editBan(ban);
+
+                                            if (success) {
+                                                sender.sendMessage("Ban was successfully updated");
+                                            } else {
+                                                sender.sendMessage("Error while updating ban");
+                                            }
+
+                                        } else {
+                                            sender.sendMessage("Please specify a valid ban id");
+                                        }
+
+                                    } catch (IllegalArgumentException e) {
+                                        sender.sendMessage("Please specify a valid long value for the ban id");
+                                    }
+
+                                } else {
+                                    sender.sendMessage("Usage: /" + this.getName() + " ban modify <id> <player/endTime/cancelled/reason> <data>");
+                                }
+
                             } else if (args[1].equalsIgnoreCase("delete")) {
 
                             } else {
@@ -210,7 +254,7 @@ public class ACCommand extends Command implements TabExecutor {
                             }
 
                         } else {
-                            sender.sendMessage("Usage: /" + this.getName() + " ban <list/info/create/modify/delete> [...]");
+                            sender.sendMessage("Usage: /" + this.getName() + " ban <list/info/create/modify/additional/delete> [...]");
                         }
 
                     } else {
@@ -289,11 +333,11 @@ public class ACCommand extends Command implements TabExecutor {
                             }
                             break;
                         case "modify":
-                            tabCompletions.add("setPlayer");
-                            tabCompletions.add("setEndTime");
-                            tabCompletions.add("setCancelled");
-                            tabCompletions.add("setReason");
-                            tabCompletions.add("setAdditionalInfo");
+                            tabCompletions.add("player");
+                            tabCompletions.add("endTime");
+                            tabCompletions.add("cancelled");
+                            tabCompletions.add("reason");
+                            tabCompletions.add("additional");
                         default:
                             break;
                     }
