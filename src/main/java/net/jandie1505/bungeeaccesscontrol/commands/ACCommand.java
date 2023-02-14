@@ -381,45 +381,119 @@ public class ACCommand extends Command implements TabExecutor {
 
                 } else if (args[0].equalsIgnoreCase("kick")) {
 
-                    if (args.length > 1) {
+                    if (sender.hasPermission(accessControl.getConfigManager().getConfig().optJSONObject("command", new JSONObject()).optJSONObject("permissions", new JSONObject()).optString("kick", "accesscontrol.command.kick"))) {
 
-                        ProxiedPlayer player;
+                        if (args.length > 1) {
 
-                        try {
-                            UUID playerUUid = UUID.fromString(args[1]);
+                            ProxiedPlayer player;
 
-                            player = this.accessControl.getProxy().getPlayer(playerUUid);
-                        } catch (IllegalArgumentException e) {
-                            player = this.accessControl.getProxy().getPlayer(args[1]);
-                        }
+                            try {
+                                UUID playerUUid = UUID.fromString(args[1]);
 
-                        if (player != null) {
+                                player = this.accessControl.getProxy().getPlayer(playerUUid);
+                            } catch (IllegalArgumentException e) {
+                                player = this.accessControl.getProxy().getPlayer(args[1]);
+                            }
 
-                            if (args.length > 2) {
+                            if (player != null) {
 
-                                String reason = "";
+                                if (args.length > 2) {
 
-                                for (int i = 2; i < args.length; i++) {
-                                    reason = reason + args[i];
+                                    String reason = "";
+
+                                    for (int i = 2; i < args.length; i++) {
+                                        reason = reason + args[i];
+                                    }
+
+                                    player.disconnect(reason);
+
+                                } else {
+                                    player.disconnect();
                                 }
 
-                                player.disconnect(reason);
-
                             } else {
-                                player.disconnect();
+                                sender.sendMessage("Player is offline");
                             }
 
                         } else {
-                            sender.sendMessage("Player is offline");
+                            sender.sendMessage("Usage: /" + this.getName() + " kick <player>");
                         }
 
                     } else {
-                        sender.sendMessage("Usage: /" + this.getName() + " kick <player>");
+                        sender.sendMessage(accessControl.getConfigManager().getConfig().optJSONObject("messages", new JSONObject()).optString("nopermission", "No permission"));
                     }
 
                 } else if (args[0].equalsIgnoreCase("maintenance")) {
 
+                    if (sender.hasPermission(accessControl.getConfigManager().getConfig().optJSONObject("command", new JSONObject()).optJSONObject("permissions", new JSONObject()).optString("maintenance", "accesscontrol.command.maintenance"))) {
+
+                        if (args.length > 1) {
+
+                            if (args[1].equalsIgnoreCase("enable")) {
+
+                                this.accessControl.setMaintenance(true);
+                                sender.sendMessage("Maintenance mode enabled");
+
+                            } else if (args[1].equalsIgnoreCase("disable")) {
+
+                                this.accessControl.setMaintenance(false);
+                                sender.sendMessage("Maintenance mode disabled");
+
+                            } else if (args[1].equalsIgnoreCase("setReason")) {
+
+                                if (args.length > 2) {
+
+                                    String reason = "";
+
+                                    for (int i = 2; i < args.length; i++) {
+                                        reason = reason + args[i];
+                                    }
+
+                                    sender.sendMessage("Currently unsupported");
+
+                                } else {
+                                    sender.sendMessage("Usage: /" + this.getName() + " maintenance setReason <reason>");
+                                }
+
+                            } else {
+                                sender.sendMessage("Invalid subcommand");
+                            }
+
+                        } else {
+                            sender.sendMessage("Usage: /" + this.getName() + " maintenance <enable/disable/setReason>");
+                        }
+
+                    } else {
+                        sender.sendMessage(accessControl.getConfigManager().getConfig().optJSONObject("messages", new JSONObject()).optString("nopermission", "No permission"));
+                    }
+
                 } else if (args[0].equalsIgnoreCase("lockdown")) {
+
+                    if (sender.hasPermission(accessControl.getConfigManager().getConfig().optJSONObject("command", new JSONObject()).optJSONObject("permissions", new JSONObject()).optString("lockdown", "accesscontrol.command.lockdown"))) {
+
+                        if (args.length > 1) {
+
+                            if (args[1].equalsIgnoreCase("test")) {
+
+                                this.accessControl.setLockdown(true);
+                                sender.sendMessage("Testing lockdown (enabled)");
+
+                            } else if (args[1].equalsIgnoreCase("reset")) {
+
+                                this.accessControl.setLockdown(false);
+                                sender.sendMessage("Lockdown was reset (disabled)");
+
+                            } else {
+                                sender.sendMessage("Invalid subcommand");
+                            }
+
+                        } else {
+                            sender.sendMessage("Usage: /" + this.getName() + " lockdown <test/reset>");
+                        }
+
+                    } else {
+                        sender.sendMessage(accessControl.getConfigManager().getConfig().optJSONObject("messages", new JSONObject()).optString("nopermission", "No permission"));
+                    }
 
                 } else if (args[0].equalsIgnoreCase("help")) {
 
