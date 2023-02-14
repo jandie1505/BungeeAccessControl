@@ -347,6 +347,26 @@ public class ACCommand extends Command implements TabExecutor {
 
                             } else if (args[1].equalsIgnoreCase("delete")) {
 
+                                if (args.length > 3) {
+
+                                    try {
+
+                                        boolean success = this.accessControl.getBanManager().deleteBan(Long.parseLong(args[3]));
+
+                                        if (success) {
+                                            sender.sendMessage("Ban was successfully deleted");
+                                        } else {
+                                            sender.sendMessage("Error while deleting ban");
+                                        }
+
+                                    } catch (IllegalArgumentException e) {
+                                        sender.sendMessage("Please specify a valid long value as ban id");
+                                    }
+
+                                } else {
+                                    sender.sendMessage("Usage: /" + this.getName() + " ban delete <id>");
+                                }
+
                             } else {
                                 sender.sendMessage(this.UNKNOWN_COMMAND);
                             }
