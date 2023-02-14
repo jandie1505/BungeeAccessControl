@@ -380,7 +380,43 @@ public class ACCommand extends Command implements TabExecutor {
                     }
 
                 } else if (args[0].equalsIgnoreCase("kick")) {
-                    
+
+                    if (args.length > 1) {
+
+                        ProxiedPlayer player;
+
+                        try {
+                            UUID playerUUid = UUID.fromString(args[1]);
+
+                            player = this.accessControl.getProxy().getPlayer(playerUUid);
+                        } catch (IllegalArgumentException e) {
+                            player = this.accessControl.getProxy().getPlayer(args[1]);
+                        }
+
+                        if (player != null) {
+
+                            if (args.length > 2) {
+
+                                String reason = "";
+
+                                for (int i = 2; i < args.length; i++) {
+                                    reason = reason + args[i];
+                                }
+
+                                player.disconnect(reason);
+
+                            } else {
+                                player.disconnect();
+                            }
+
+                        } else {
+                            sender.sendMessage("Player is offline");
+                        }
+
+                    } else {
+                        sender.sendMessage("Usage: /" + this.getName() + " kick <player>");
+                    }
+
                 } else if (args[0].equalsIgnoreCase("maintenance")) {
 
                 } else if (args[0].equalsIgnoreCase("lockdown")) {
