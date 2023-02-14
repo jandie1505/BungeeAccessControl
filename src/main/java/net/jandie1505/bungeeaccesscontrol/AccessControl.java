@@ -9,6 +9,7 @@ import net.jandie1505.bungeeaccesscontrol.managers.data.Ban;
 import net.md_5.bungee.api.plugin.Plugin;
 
 public class AccessControl extends Plugin {
+    public static final String VERSION = "1.0";
     private static AccessControl accessControl;
 
     // PLUGIN

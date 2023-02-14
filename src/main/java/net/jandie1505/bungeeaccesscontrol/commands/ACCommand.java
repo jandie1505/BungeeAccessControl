@@ -7,16 +7,17 @@ import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class ACCommand extends Command implements TabExecutor {
     private final AccessControl accessControl;
+    private final String UNKNOWN_COMMAND;
+    private final String TIME_FORMAT_ERROR;
 
     public ACCommand(AccessControl accessControl) {
         super(
@@ -25,186 +26,221 @@ public class ACCommand extends Command implements TabExecutor {
                 Utilities.aliases(accessControl.getConfigManager().getConfig().optJSONObject("command", new JSONObject()))
         );
         this.accessControl = accessControl;
+        this.UNKNOWN_COMMAND = "Unknown command. Use /" + this.getName() + " help for help.";
+        this.TIME_FORMAT_ERROR = "Please specify a valid time string:\n" +
+                "Time format: <prefix><time>\n" +
+                "<time> is a time in seconds.\n" +
+                "<prefix> is r for relative time (r30: ban for 30 seconds) or a for absolute unix time (a1676390535: ban until 1676390535 seconds after 1st Jan 1970).";
     }
 
     @Override
     public void execute(CommandSender sender, String[] args) {
-        if (!sender.hasPermission(accessControl.getConfigManager().getConfig().optJSONObject("command", new JSONObject()).optJSONObject("permissions", new JSONObject()).optString("permission", "accesscontrol.command"))) {
-            accessControl.getConfigManager().getConfig().optJSONObject("messages", new JSONObject()).optString("noPermission", "Unknown command usage. Use /ac help for help.")
-            return;
-        }
+        if (sender.hasPermission(accessControl.getConfigManager().getConfig().optJSONObject("command", new JSONObject()).optJSONObject("permissions", new JSONObject()).optString("base", "accesscontrol.command"))) {
+            
+            if (args.length > 0) {
 
-        if (args.length >= 1) {
+                if (args[0].equalsIgnoreCase("ban")) {
 
-            switch (args[0]) {
-                case "ban":
-                    this.banSubcommand(sender, args);
-                    break;
-                case "kick":
-                    this.kickSubcommand(sender, args);
-                    break;
-                case "maintenance":
-                    this.maintenanceSubcommand(sender, args);
-                    break;
-                case "lockdown":
-                    this.lockdownSubcommand(sender, args);
-                    break;
-                case "help":
-                    this.helpSubcommand(sender, args);
-                    break;
-                default:
-                    break;
+                    if (sender.hasPermission(accessControl.getConfigManager().getConfig().optJSONObject("command", new JSONObject()).optJSONObject("permissions", new JSONObject()).optString("ban", "accesscontrol.command.ban"))) {
+
+                        if (args.length > 1) {
+
+                            if (args[1].equalsIgnoreCase("list")) {
+
+                                // ban list [player]
+
+                                List<Ban> bans;
+                                String reply;
+
+                                if (args.length > 2) {
+
+                                    UUID target = Utilities.getPlayerIdFromString(this.accessControl, args[2]);
+
+                                    if (target == null) {
+                                        sender.sendMessage("Player not found");
+                                        return;
+                                    }
+
+                                    bans = this.accessControl.getBanManager().getBans(target);
+                                    reply = "Bans of " + target + ":\n";
+                                } else {
+                                    bans = this.accessControl.getBanManager().getBans();
+                                    reply = "Bans of the Server:\n";
+                                }
+
+                                for (Ban ban : bans) {
+                                    reply = reply + "id=" + ban.getId() + ";player=" + ban.getPlayer().toString() + ";endTime=" + ban.getEndTime() + "cancelled=" + ban.isCancelled() + "\n" ;
+                                }
+
+                                sender.sendMessage(reply);
+                            } else if (args[1].equalsIgnoreCase("info")) {
+
+                                // ban info <id>
+
+                                if (args.length > 2) {
+
+                                    try {
+
+                                        Ban ban = this.accessControl.getBanManager().getBan(Long.parseLong(args[2]));
+
+                                        if (ban == null) {
+                                            sender.sendMessage("Please specify a valid ban id");
+                                            return;
+                                        }
+
+                                        sender.sendMessage("----- BAN INFORMATION -----\n" +
+                                                "ID: " + ban.getId() + "\n" +
+                                                "Player: " + ban.getPlayer() + "\n" +
+                                                "End time: " + ban.getEndTime() + "\n" +
+                                                "Cancelled: " + ban.isCancelled() + "\n" +
+                                                "Reason: " + ban.getReason() + "\n" +
+                                                "Additional info: " + ban.exportAdditional().toString() + "\n" +
+                                                "---------------------------");
+
+                                    } catch (IllegalArgumentException e) {
+                                        sender.sendMessage("Please specify a valid long value");
+                                    }
+
+                                } else {
+                                    sender.sendMessage("Usage: /" + this.getName() + " ban info <id>");
+                                }
+
+                            } else if (args[1].equalsIgnoreCase("create")) {
+
+                                // /ban create <player> [endTime] [reason]
+
+                                if (args.length > 2) {
+
+                                    UUID player = Utilities.getPlayerIdFromString(this.accessControl, args[2]);
+
+                                    if (player != null) {
+
+                                        if (args.length > 3) {
+
+                                            String timeString = args[3];
+                                            long time = -1;
+
+                                            try {
+                                                if (timeString.length() >= 2) {
+
+                                                    if (timeString.startsWith("r")) {
+
+                                                        time = Instant.now().getEpochSecond() + Long.parseLong(timeString.substring(1));
+
+                                                    } else if (timeString.startsWith("a")) {
+
+                                                        time = Long.parseLong(timeString.substring(1));
+
+                                                    } else {
+                                                        sender.sendMessage(this.TIME_FORMAT_ERROR);
+                                                        return;
+                                                    }
+
+                                                } else {
+                                                    sender.sendMessage(this.TIME_FORMAT_ERROR);
+                                                    return;
+                                                }
+                                            } catch (IllegalArgumentException e) {
+                                                sender.sendMessage(this.TIME_FORMAT_ERROR);
+                                                return;
+                                            }
+
+                                            if (time >= 0) {
+
+                                                if (args.length > 4) {
+
+                                                    String reasonString = "";
+
+                                                    for (int i = 4; i < args.length; i++) {
+
+                                                        reasonString = reasonString + args[i];
+
+                                                    }
+
+                                                    long banId = this.accessControl.getBanManager().banPlayer(player, time, reasonString, null);
+
+                                                    if (banId >= 0) {
+                                                        sender.sendMessage("Ban with id " + banId + " was created");
+                                                    } else {
+                                                        sender.sendMessage("Error while creating ban");
+                                                    }
+
+                                                } else {
+
+                                                    long banId = this.accessControl.getBanManager().banPlayer(player, time, null, null);
+
+                                                    if (banId >= 0) {
+                                                        sender.sendMessage("Ban with id " + banId + " was created");
+                                                    } else {
+                                                        sender.sendMessage("Error while creating ban");
+                                                    }
+
+                                                }
+
+                                            } else {
+                                                sender.sendMessage(this.TIME_FORMAT_ERROR);
+                                            }
+
+                                        } else {
+
+                                            long banId = this.accessControl.getBanManager().banPlayer(player, null, null, null);
+
+                                            if (banId >= 0) {
+                                                sender.sendMessage("Ban with id " + banId + " was created");
+                                            } else {
+                                                sender.sendMessage("Error while creating ban");
+                                            }
+
+                                        }
+
+                                    } else {
+                                        sender.sendMessage("Player not found");
+                                    }
+
+                                } else {
+                                    sender.sendMessage("Usage: /" + this.getName() + " ban create <player> [endTime] [reason]");
+                                }
+
+                            } else if (args[1].equalsIgnoreCase("modify")) {
+
+                            } else if (args[1].equalsIgnoreCase("delete")) {
+
+                            } else {
+                                sender.sendMessage(this.UNKNOWN_COMMAND);
+                            }
+
+                        } else {
+                            sender.sendMessage("Usage: /" + this.getName() + " ban <list/info/create/modify/delete> [...]");
+                        }
+
+                    } else {
+                        sender.sendMessage(accessControl.getConfigManager().getConfig().optJSONObject("messages", new JSONObject()).optString("nopermission", "No permission"));
+                    }
+
+                } else if (args[0].equalsIgnoreCase("kick")) {
+                    
+                } else if (args[0].equalsIgnoreCase("maintenance")) {
+
+                } else if (args[0].equalsIgnoreCase("lockdown")) {
+
+                } else if (args[0].equalsIgnoreCase("help")) {
+
+                } else {
+                    sender.sendMessage(this.UNKNOWN_COMMAND);
+                }
+
+            } else {
+                sender.sendMessage("BungeeAccessControl " + AccessControl.VERSION + "by jandie1505\nHelp command: /" + this.getName() + " help");
             }
 
         } else {
-            sender.sendMessage(accessControl.getConfigManager().getConfig().optJSONObject("messages", new JSONObject()).optString("unknownCommandUsage", "Unknown command usage. Use /ac help for help."));
+            sender.sendMessage(accessControl.getConfigManager().getConfig().optJSONObject("messages", new JSONObject()).optString("nopermission", "No permission"));
         }
-    }
-
-    private void banSubcommand(CommandSender sender, String[] args) {
-        if (!sender.hasPermission(accessControl.getConfigManager().getConfig().optJSONObject("command", new JSONObject()).optJSONObject("permissions", new JSONObject()).optString("permission", "accesscontrol.command.ban"))) {
-            sender.sendMessage(accessControl.getConfigManager().getConfig().optJSONObject("messages", new JSONObject()).optString("noPermission", "Unknown command usage. Use /ac help for help."));
-            return;
-        }
-
-        if (args.length <= 1) {
-            sender.sendMessage(accessControl.getConfigManager().getConfig().optJSONObject("messages", new JSONObject()).optString("unknownCommandUsage", "Unknown command usage. Use /ac help for help."));
-            return;
-        }
-
-        switch (args[1]) {
-            case "list":
-
-                List<Ban> banList;
-
-                if (args.length == 3) {
-                    UUID playerId = Utilities.getPlayerIdFromString(this.accessControl, args[2]);
-
-                    if (playerId == null) {
-                        sender.sendMessage("You need to specify a valid UUID or an online player");
-                        return;
-                    }
-
-                    banList = this.accessControl.getBanManager().getBans(playerId);
-                } else {
-                    banList = this.accessControl.getBanManager().getBans();
-                }
-
-                if (banList.isEmpty()) {
-                    sender.sendMessage("No bans found");
-                    return;
-                }
-
-                for (Ban ban : banList) {
-                    sender.sendMessage("id=" + ban.getId() + ";uuid=" + ban.getPlayer().toString() + ";endTime=" + ban.getEndTime() + ";reason=" + ban.getReason() + ";cancelled=" + ban.isCancelled());
-                }
-
-                break;
-            case "info":
-                if (args.length < 3) {
-                    sender.sendMessage("You need to specify a valid ban id");
-                    return;
-                }
-
-                long banId;
-
-                try {
-                    banId = Long.parseLong(args[2]);
-                } catch (IllegalArgumentException e) {
-                    sender.sendMessage("You need to specify a valid ban id");
-                    return;
-                }
-
-                Ban ban = this.accessControl.getBanManager().getBan(banId);
-
-                if (ban == null) {
-                    sender.sendMessage("Ban not found");
-                    return;
-                }
-
-                sender.sendMessage("----- BAN INFORMATION -----\n" +
-                        "ID: " + ban.getId() + "\n" +
-                        "Player UUID: " + ban.getPlayer().toString() + "\n" +
-                        "End time: " + ban.getEndTime() + "\n" +
-                        "Reason: " + ban.getReason() + "\n" +
-                        "Cancelled: " + ban.isCancelled() + "\n" +
-                        "Additional data:" + ban.exportAdditional().toString() + "\n" +
-                        "---------------------------");
-
-                break;
-            case "create":
-                if (args.length < 3) {
-                    sender.sendMessage("You need to specify a player");
-                    return;
-                }
-
-                UUID playerId = Utilities.getPlayerIdFromString(this.accessControl, args[2]);
-
-                if (playerId == null) {
-                    sender.sendMessage("You need to specify a valid UUID or an online player");
-                }
-
-                Long endTime = null;
-                String reason = null;
-                JSONObject additionalData = null;
-
-                if (args.length >= 4) {
-                    try {
-                        endTime = Long.parseLong(args[3]);
-                    } catch (IllegalArgumentException e) {
-                        if (!(args[3].equalsIgnoreCase("null") || args[3].equalsIgnoreCase("permanent") || args[3].equalsIgnoreCase("-"))) {
-                            sender.sendMessage("You need to specify a valid ban unix time stamp or null/permanent/- for permanent");
-                            return;
-                        }
-                    }
-                }
-
-                if (args.length >= 5) {
-                    reason = args[4].replace("{SPACE}", " ");
-                }
-
-                if (args.length >= 6) {
-                    try {
-                        additionalData = new JSONObject(args[5].replace("{SPACE}", " "));
-                    } catch (JSONException e) {
-                        sender.sendMessage("Invalid additional data json string");
-                        return;
-                    }
-                }
-
-                long banId = this.accessControl.getBanManager().banPlayer(playerId, endTime, reason, additionalData);
-
-                if (banId > 0) {
-                    sender.sendMessage("Ban with id " + banId + " was created");
-                } else {
-                    sender.sendMessage("Error while creating ban");
-                }
-
-                break;
-            default:
-                break;
-        }
-    }
-
-    private void kickSubcommand(CommandSender sender, String[] args) {
-
-    }
-
-    private void maintenanceSubcommand(CommandSender sender, String[] args) {
-
-    }
-
-    private void lockdownSubcommand(CommandSender sender, String[] args) {
-
-    }
-
-    private void helpSubcommand(CommandSender sender, String[] args) {
-
     }
 
     @Override
     public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
-        if (sender instanceof ProxiedPlayer && !sender.hasPermission(accessControl.getConfigManager().getConfig().optJSONObject("command", new JSONObject()).optJSONObject("permissions", new JSONObject()).optString("permission", "accesscontrol.command"))) {
+        if (sender instanceof ProxiedPlayer && !sender.hasPermission(accessControl.getConfigManager().getConfig().optJSONObject("command", new JSONObject()).optJSONObject("permissions", new JSONObject()).optString("base", "accesscontrol.command"))) {
             return List.of();
         }
 

@@ -55,7 +55,6 @@ public final class DefaultConfigValues {
 
         JSONObject messagesConfig = new JSONObject();
         messagesConfig.put("noPermission", "No permission!");
-        messagesConfig.put("unknownCommandUsage", "Unknown command usage. Use /ac help for help.");
         config.put("messages", messagesConfig);
 
         return config;
