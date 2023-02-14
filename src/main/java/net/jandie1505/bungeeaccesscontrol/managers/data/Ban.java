@@ -74,6 +74,10 @@ public class Ban implements Comparable<Ban> {
         return this.additional;
     }
 
+    public void importAdditional(JSONObject jsonObject) {
+        this.additional = new JSONObject(jsonObject.toString());
+    }
+
     /**
      * Returns if a ban is active or not
      * @return boolean

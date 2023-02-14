@@ -7,6 +7,7 @@ import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.time.Instant;
@@ -247,6 +248,103 @@ public class ACCommand extends Command implements TabExecutor {
                                     sender.sendMessage("Usage: /" + this.getName() + " ban modify <id> <player/endTime/cancelled/reason> <data>");
                                 }
 
+                            } else if (args[1].equalsIgnoreCase("additional")) {
+
+                                if (args.length > 3) {
+
+                                    try {
+
+                                        Ban ban = this.accessControl.getBanManager().getBan(Long.parseLong(args[3]));
+
+                                        if (ban != null) {
+
+                                            if (args[2].equalsIgnoreCase("get")) {
+
+                                                if (args.length > 4) {
+
+                                                    sender.sendMessage("Additional data for plugin " + args[4] + ": " + ban.getAdditionalData(args[4]).toString());
+
+                                                } else {
+                                                    sender.sendMessage("Usage: /" + this.getName() + " ban additional get <id> <plugin>");
+                                                }
+
+                                            } else if (args[2].equalsIgnoreCase("getFull")) {
+
+                                                sender.sendMessage("Additional data: " + ban.exportAdditional().toString());
+
+                                            } else if (args[2].equalsIgnoreCase("set")) {
+
+                                                if (args.length > 5) {
+
+                                                    String data = "";
+
+                                                    for (int i = 5; i < args.length; i++) {
+                                                        data = args[i];
+                                                    }
+
+                                                    try {
+                                                        ban.setAdditionalData(args[4], new JSONObject(data));
+
+                                                        boolean success = this.accessControl.getBanManager().editBan(ban);
+
+                                                        if (success) {
+                                                            sender.sendMessage("Additional data was updated");
+                                                        } else {
+                                                            sender.sendMessage("Error while updating additional data");
+                                                        }
+                                                    } catch (JSONException e) {
+                                                        sender.sendMessage("Invalid JSON");
+                                                    }
+
+                                                } else {
+                                                    sender.sendMessage("Usage: /" + this.getName() + " ban additional <id> <plugin> <JSONObject>");
+                                                }
+
+                                            } else if (args[2].equalsIgnoreCase("override")) {
+
+                                                if (this.accessControl.getConfigManager().getConfig().optJSONObject("command", new JSONObject()).optBoolean("allowAdditionalOverrideCommand", false)) {
+
+                                                    if (args.length > 4) {
+
+                                                        String data = "";
+
+                                                        for (int i = 4; i < args.length; i++) {
+                                                            data = data + args[i];
+                                                        }
+
+                                                        try {
+
+                                                            ban.importAdditional(new JSONObject(data));
+                                                            this.accessControl.getBanManager().editBan(ban);
+
+                                                            sender.sendMessage("Additional data was successfully overridden");
+
+                                                        } catch (JSONException e) {
+                                                            sender.sendMessage("Invalid JSON");
+                                                        }
+
+                                                    }
+
+                                                } else {
+                                                    sender.sendMessage("Enable allowAdditionalOverrideCommand in config to use this command");
+                                                }
+
+                                            } else {
+                                                sender.sendMessage("Available subcommands: get, getFull, set, override");
+                                            }
+
+                                        } else {
+                                            sender.sendMessage("Ban with the specified id was not found");
+                                        }
+
+                                    } catch (IllegalArgumentException e) {
+                                        sender.sendMessage("Please specify a valid long value for the ban id");
+                                    }
+
+                                } else {
+                                    sender.sendMessage("Usage: /" + this.getName() + " ban additional <get/getFull/set/override> <id> <plugin/-/plugin/JSONObject> <-/-/JSONObject/->");
+                                }
+
                             } else if (args[1].equalsIgnoreCase("delete")) {
 
                             } else {
@@ -298,6 +396,7 @@ public class ACCommand extends Command implements TabExecutor {
                     tabCompletions.add("info");
                     tabCompletions.add("create");
                     tabCompletions.add("modify");
+                    tabCompletions.add("additional");
                     tabCompletions.add("delete");
                     break;
                 case "kick":
@@ -337,7 +436,13 @@ public class ACCommand extends Command implements TabExecutor {
                             tabCompletions.add("endTime");
                             tabCompletions.add("cancelled");
                             tabCompletions.add("reason");
-                            tabCompletions.add("additional");
+                        case "additional":
+                            tabCompletions.add("get");
+                            tabCompletions.add("getFull");
+                            tabCompletions.add("set");
+                            if (this.accessControl.getConfigManager().getConfig().optJSONObject("command", new JSONObject()).optBoolean("allowAdditionalOverrideCommand", false)) {
+                                tabCompletions.add("override");
+                            }
                         default:
                             break;
                     }

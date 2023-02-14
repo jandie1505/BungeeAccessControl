@@ -50,6 +50,7 @@ public final class DefaultConfigValues {
         permissionAccessControlCommandConfig.put("kick", "accesscontrol.command.kick");
         permissionAccessControlCommandConfig.put("maintenance", "accesscontrol.command.maintenance");
         permissionAccessControlCommandConfig.put("lockdown", "accesscontrol.command.lockdown");
+        commandConfig.put("allowAdditionalOverrideCommand", false);
         commandConfig.put("permissions", permissionAccessControlCommandConfig);
         config.put("command", commandConfig);
 
