@@ -598,14 +598,7 @@ public class ACCommand extends Command implements TabExecutor {
 
                 if (args[0].equalsIgnoreCase("ban")) {
 
-                    if (args[1].equalsIgnoreCase("modify")) {
-
-                        tabCompletions.add("player");
-                        tabCompletions.add("endTime");
-                        tabCompletions.add("cancelled");
-                        tabCompletions.add("reason");
-
-                    } else if (args[1].equalsIgnoreCase("additional")) {
+                    if (args[1].equalsIgnoreCase("additional")) {
 
                         tabCompletions.add("get");
                         tabCompletions.add("getFull");
@@ -616,6 +609,17 @@ public class ACCommand extends Command implements TabExecutor {
                         }
 
                     }
+
+                }
+
+            } else if (args.length == 4) {
+
+                if (args[1].equalsIgnoreCase("modify")) {
+
+                    tabCompletions.add("player");
+                    tabCompletions.add("endTime");
+                    tabCompletions.add("cancelled");
+                    tabCompletions.add("reason");
 
                 }
 
