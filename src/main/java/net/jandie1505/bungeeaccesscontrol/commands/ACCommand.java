@@ -376,11 +376,11 @@ public class ACCommand extends Command implements TabExecutor {
 
                             } else if (args[1].equalsIgnoreCase("delete")) {
 
-                                if (args.length > 3) {
+                                if (args.length > 2) {
 
                                     try {
 
-                                        boolean success = this.accessControl.getBanManager().deleteBan(Long.parseLong(args[3]));
+                                        boolean success = this.accessControl.getBanManager().deleteBan(Long.parseLong(args[2]));
 
                                         if (success) {
                                             sender.sendMessage("Ban was successfully deleted");
