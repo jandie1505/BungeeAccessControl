@@ -95,6 +95,7 @@ public class ACCommand extends Command implements TabExecutor {
                                                 "Cancelled: " + ban.isCancelled() + "\n" +
                                                 "Reason: " + ban.getReason() + "\n" +
                                                 "Additional info: " + ban.exportAdditional().toString() + "\n" +
+                                                "Active: " + ban.isActive() + "\n" +
                                                 "---------------------------");
 
                                     } catch (IllegalArgumentException e) {
