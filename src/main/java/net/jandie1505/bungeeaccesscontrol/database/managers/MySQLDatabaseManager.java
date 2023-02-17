@@ -32,14 +32,14 @@ public class MySQLDatabaseManager implements DatabaseManager {
 
             this.connection.prepareStatement(
                     "CREATE TABLE IF NOT EXISTS cache (" +
-                            "uuid VARCHAR(255) NOT NULL," +
-                            "name VARCHAR(255)," +
+                            "uuid VARCHAR(255) PRIMARY KEY NOT NULL," +
+                            "name VARCHAR(255)" +
                             ");"
             ).execute();
 
             this.connection.prepareStatement(
                     "CREATE TABLE IF NOT EXISTS bans (" +
-                            "id PRIMARY KEY BIGINT NOT NULL AUTOINCREMENT," +
+                            "id BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT," +
                             "player VARCHAR(255) NOT NULL," +
                             "endTime BIGINT," +
                             "reason VARCHAR(255)," +
@@ -168,7 +168,11 @@ public class MySQLDatabaseManager implements DatabaseManager {
 
             if (statement.executeUpdate() != 0) {
                 ResultSet rs = statement.getGeneratedKeys();
-                return rs.getLong(1);
+                if (rs.next()) {
+                    return rs.getLong(1);
+                } else {
+                    return -1;
+                }
             } else {
                 return -1;
             }
