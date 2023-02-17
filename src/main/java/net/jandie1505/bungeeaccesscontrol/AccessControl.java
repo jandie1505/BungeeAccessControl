@@ -23,10 +23,13 @@ public class AccessControl extends Plugin {
 
     @Override
     public void onEnable() {
+        this.getLogger().info("Enabling BungeeAccessControl...");
+
         this.lockdown = false;
         this.maintenance = false;
 
         this.configManager = new ConfigManager(this, DefaultConfigValues.getConfig(), "config.json");
+        this.configManager.reloadConfig();
         this.databaseManager = new MySQLDatabaseManager(this);
         this.banManager = new BanManager(this);
 
@@ -34,6 +37,8 @@ public class AccessControl extends Plugin {
         this.getProxy().getPluginManager().registerCommand(this, new ACCommand(this));
 
         accessControl = this;
+
+        this.getLogger().info("BungeeAccessControl " + AccessControl.VERSION + " by jandie1505 was successfully enabled");
     }
 
     public boolean isLockdown() {

@@ -40,6 +40,7 @@ public class ConfigManager {
     public void reloadConfig() {
         try {
             if (!this.configFile.exists()) {
+                this.configFile.getParentFile().mkdirs();
                 this.configFile.createNewFile();
                 this.writeConfig();
             }
