@@ -210,10 +210,7 @@ public class MySQLDatabaseManager implements DatabaseManager {
     public boolean editBan(BanData banData) {
         try {
             PreparedStatement statement = connection.prepareStatement(
-                    "UPDATE bans" +
-                            "SET player = ?, endTime = ?, reason = ?, cancelled = ?, additional = ?" +
-                            "WHERE id = ?" +
-                            ";"
+                    "UPDATE bans SET player = ?, endTime = ?, reason = ?, cancelled = ?, additional = ? WHERE id = ?;"
             );
 
             if (banData.getPlayer() == null) {
