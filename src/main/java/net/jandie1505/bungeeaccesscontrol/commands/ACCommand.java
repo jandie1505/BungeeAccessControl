@@ -12,6 +12,7 @@ import org.json.JSONObject;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -297,7 +298,25 @@ public class ACCommand extends Command implements TabExecutor {
                                                     }
 
                                                 } else {
-                                                    sender.sendMessage("Usage: /" + this.getName() + " ban additional <id> <plugin> <JSONObject>");
+                                                    sender.sendMessage("Usage: /" + this.getName() + " ban additional set <id> <plugin> <JSONObject>");
+                                                }
+
+                                            } else if (args[2].equalsIgnoreCase("remove")) {
+
+                                                if (args.length > 4) {
+
+                                                    ban.deleteAdditionalData(args[4]);
+
+                                                    boolean success = this.accessControl.getBanManager().editBan(ban);
+
+                                                    if (success) {
+                                                        sender.sendMessage("Additional data was removed");
+                                                    } else {
+                                                        sender.sendMessage("Error while removing additional data");
+                                                    }
+
+                                                } else {
+                                                    sender.sendMessage("Usage: /" + this.getName() + " ban additional remove <id> <plugin>");
                                                 }
 
                                             } else if (args[2].equalsIgnoreCase("override")) {
@@ -330,7 +349,7 @@ public class ACCommand extends Command implements TabExecutor {
                                                 }
 
                                             } else {
-                                                sender.sendMessage("Available subcommands: get, getFull, set, override");
+                                                sender.sendMessage("Available subcommands: get, getFull, set, remove, override");
                                             }
 
                                         } else {
@@ -342,7 +361,7 @@ public class ACCommand extends Command implements TabExecutor {
                                     }
 
                                 } else {
-                                    sender.sendMessage("Usage: /" + this.getName() + " ban additional <get/getFull/set/override> <id> <plugin/-/plugin/JSONObject> <-/-/JSONObject/->");
+                                    sender.sendMessage("Usage: /" + this.getName() + " ban additional <get/getFull/set/remove/override> <id> <plugin/-/plugin/plugin/JSONObject> <-/-/JSONObject/-/->");
                                 }
 
                             } else if (args[1].equalsIgnoreCase("delete")) {
@@ -502,7 +521,7 @@ public class ACCommand extends Command implements TabExecutor {
                 }
 
             } else {
-                sender.sendMessage("BungeeAccessControl " + AccessControl.VERSION + "by jandie1505\nHelp command: /" + this.getName() + " help");
+                sender.sendMessage("BungeeAccessControl " + AccessControl.VERSION + " by jandie1505\nHelp command: /" + this.getName() + " help");
             }
 
         } else {
@@ -512,89 +531,79 @@ public class ACCommand extends Command implements TabExecutor {
 
     @Override
     public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
-        if (sender instanceof ProxiedPlayer && !sender.hasPermission(accessControl.getConfigManager().getConfig().optJSONObject("command", new JSONObject()).optJSONObject("permissions", new JSONObject()).optString("base", "accesscontrol.command"))) {
-            return List.of();
-        }
 
         List<String> tabCompletions = new ArrayList<>();
 
-        if (args.length == 1) {
+        if (sender.hasPermission(accessControl.getConfigManager().getConfig().optJSONObject("command", new JSONObject()).optJSONObject("permissions", new JSONObject()).optString("base", "accesscontrol.command"))) {
 
-            switch (args[0]) {
-                case "ban":
+            if (args.length == 1) {
+
+                tabCompletions.add("ban");
+                tabCompletions.add("kick");
+                tabCompletions.add("maintenance");
+                tabCompletions.add("lockdown");
+                tabCompletions.add("help");
+
+            } else if (args.length == 2) {
+
+                if (args[0].equalsIgnoreCase("ban")) {
+
                     tabCompletions.add("list");
                     tabCompletions.add("info");
                     tabCompletions.add("create");
                     tabCompletions.add("modify");
                     tabCompletions.add("additional");
                     tabCompletions.add("delete");
-                    break;
-                case "kick":
+
+                } else if (args[0].equalsIgnoreCase("kick")) {
+
                     for (ProxiedPlayer player : List.copyOf(this.accessControl.getProxy().getPlayers())) {
                         if (player != null) {
                             tabCompletions.add(player.getName());
                         }
                     }
-                    break;
-                case "maintenance":
+
+                } else if (args[0].equalsIgnoreCase("maintenance")) {
+
                     tabCompletions.add("enable");
                     tabCompletions.add("disable");
+                    tabCompletions.add("status");
                     tabCompletions.add("setReason");
-                    break;
-                case "lockdown":
+
+                } else if (args[0].equalsIgnoreCase("lockdown")) {
+
                     tabCompletions.add("test");
                     tabCompletions.add("reset");
-                    break;
-                default:
-                    break;
-            }
+                    tabCompletions.add("status");
 
-        } else if (args.length == 2) {
+                }
 
-            switch (args[0]) {
-                case "ban":
-                    switch (args[1]) {
-                        case "create":
-                            for (ProxiedPlayer player : List.copyOf(this.accessControl.getProxy().getPlayers())) {
-                                if (player != null) {
-                                    tabCompletions.add(player.getName());
-                                }
-                            }
-                            break;
-                        case "modify":
-                            tabCompletions.add("player");
-                            tabCompletions.add("endTime");
-                            tabCompletions.add("cancelled");
-                            tabCompletions.add("reason");
-                        case "additional":
-                            tabCompletions.add("get");
-                            tabCompletions.add("getFull");
-                            tabCompletions.add("set");
-                            if (this.accessControl.getConfigManager().getConfig().optJSONObject("command", new JSONObject()).optBoolean("allowAdditionalOverrideCommand", false)) {
-                                tabCompletions.add("override");
-                            }
-                        default:
-                            break;
-                    }
-                    break;
-                case "kick":
-                    for (ProxiedPlayer player : List.copyOf(this.accessControl.getProxy().getPlayers())) {
-                        if (player != null) {
-                            tabCompletions.add(player.getName());
+            } else if (args.length == 3) {
+
+                if (args[0].equalsIgnoreCase("ban")) {
+
+                    if (args[1].equalsIgnoreCase("modify")) {
+
+                        tabCompletions.add("player");
+                        tabCompletions.add("endTime");
+                        tabCompletions.add("cancelled");
+                        tabCompletions.add("reason");
+
+                    } else if (args[1].equalsIgnoreCase("additional")) {
+
+                        tabCompletions.add("get");
+                        tabCompletions.add("getFull");
+                        tabCompletions.add("set");
+                        tabCompletions.add("remove");
+                        if (this.accessControl.getConfigManager().getConfig().optJSONObject("command", new JSONObject()).optBoolean("allowAdditionalOverrideCommand", false)) {
+                            tabCompletions.add("override");
                         }
+
                     }
-                    break;
-                default:
-                    break;
+
+                }
+
             }
-
-        } else {
-
-            tabCompletions.add("ban");
-            tabCompletions.add("kick");
-            tabCompletions.add("maintenance");
-            tabCompletions.add("lockdown");
-            tabCompletions.add("help");
 
         }
 
