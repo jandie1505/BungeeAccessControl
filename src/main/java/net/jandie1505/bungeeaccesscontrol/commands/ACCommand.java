@@ -514,12 +514,16 @@ public class ACCommand extends Command implements TabExecutor {
                                 this.accessControl.setLockdown(false);
                                 sender.sendMessage("Lockdown was reset (disabled)");
 
+                            } else if (args[1].equalsIgnoreCase("status")) {
+
+                                sender.sendMessage("Current lockdown status: " + this.accessControl.isLockdown());
+
                             } else {
                                 sender.sendMessage("Invalid subcommand");
                             }
 
                         } else {
-                            sender.sendMessage("Usage: /" + this.getName() + " lockdown <test/reset>");
+                            sender.sendMessage("Usage: /" + this.getName() + " lockdown <test/reset/status>");
                         }
 
                     } else {
