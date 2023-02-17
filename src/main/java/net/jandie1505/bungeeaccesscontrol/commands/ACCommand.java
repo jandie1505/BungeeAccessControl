@@ -614,12 +614,16 @@ public class ACCommand extends Command implements TabExecutor {
 
             } else if (args.length == 4) {
 
-                if (args[1].equalsIgnoreCase("modify")) {
+                if (args[0].equalsIgnoreCase("ban")) {
 
-                    tabCompletions.add("player");
-                    tabCompletions.add("endTime");
-                    tabCompletions.add("cancelled");
-                    tabCompletions.add("reason");
+                    if (args[1].equalsIgnoreCase("modify")) {
+
+                        tabCompletions.add("player");
+                        tabCompletions.add("endTime");
+                        tabCompletions.add("cancelled");
+                        tabCompletions.add("reason");
+
+                    }
 
                 }
 
