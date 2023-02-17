@@ -120,9 +120,13 @@ public class ACCommand extends Command implements TabExecutor {
                                         if (args.length > 3) {
 
                                             String timeString = args[3];
-                                            long time = Utilities.createTimeFromInput(timeString);
+                                            Long time = null;
 
-                                            if (time >= 0) {
+                                            if (!timeString.equalsIgnoreCase("null") && !timeString.equalsIgnoreCase("-") && !timeString.equalsIgnoreCase("permanent")) {
+                                                time = Utilities.createTimeFromInput(timeString);
+                                            }
+
+                                            if (time != null && time >= 0) {
 
                                                 if (args.length > 4) {
 
@@ -201,9 +205,13 @@ public class ACCommand extends Command implements TabExecutor {
 
                                             } else if (args[3].equalsIgnoreCase("endTime")) {
 
-                                                long time = Utilities.createTimeFromInput(args[4]);
+                                                Long time = null;
 
-                                                if (time >= 0) {
+                                                if (!args[4].equalsIgnoreCase("null") && !args[4].equalsIgnoreCase("-") && !args[4].equalsIgnoreCase("permanent")) {
+                                                    time = Utilities.createTimeFromInput(args[4]);
+                                                }
+
+                                                if (time != null && time >= 0) {
                                                     ban.setEndTime(time);
                                                 } else {
                                                     sender.sendMessage(this.TIME_FORMAT_ERROR);
@@ -222,7 +230,11 @@ public class ACCommand extends Command implements TabExecutor {
                                                     reasonString = reasonString + args[i];
                                                 }
 
-                                                ban.setReason(reasonString);
+                                                if (!reasonString.equalsIgnoreCase("null") && !reasonString.equalsIgnoreCase("-")) {
+                                                    ban.setReason(reasonString);
+                                                } else {
+                                                    ban.setReason(null);
+                                                }
 
                                             } else {
                                                 sender.sendMessage("You can only modify player, endTime, cancelled and reason");
