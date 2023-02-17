@@ -73,5 +73,9 @@ public class EventListener implements Listener {
                 }
             }
         }
+
+        if (this.accessControl.getConfigManager().getConfig().optBoolean("playerCaching", false)) {
+            this.accessControl.getPlayerCacheManager().cachePlayer(event.getPlayer().getUniqueId(), event.getPlayer().getName());
+        }
     }
 }

@@ -61,6 +61,8 @@ public final class DefaultConfigValues {
         messagesConfig.put("noPermission", "No permission!");
         config.put("messages", messagesConfig);
 
+        config.put("playerCaching", true);
+
         return config;
     }
 }
