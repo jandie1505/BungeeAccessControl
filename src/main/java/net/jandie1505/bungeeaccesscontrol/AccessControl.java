@@ -5,6 +5,7 @@ import net.jandie1505.bungeeaccesscontrol.config.ConfigManager;
 import net.jandie1505.bungeeaccesscontrol.config.DefaultConfigValues;
 import net.jandie1505.bungeeaccesscontrol.database.DatabaseManager;
 import net.jandie1505.bungeeaccesscontrol.database.managers.MySQLDatabaseManager;
+import net.jandie1505.bungeeaccesscontrol.events.EventListener;
 import net.jandie1505.bungeeaccesscontrol.managers.BanManager;
 import net.jandie1505.bungeeaccesscontrol.managers.data.Ban;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -30,6 +31,7 @@ public class AccessControl extends Plugin {
         this.databaseManager = new MySQLDatabaseManager(this);
         this.banManager = new BanManager(this);
 
+        this.getProxy().getPluginManager().registerListener(this, new EventListener(this));
         this.getProxy().getPluginManager().registerCommand(this, new ACCommand(this));
 
         accessControl = this;

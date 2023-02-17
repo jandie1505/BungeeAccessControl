@@ -47,14 +47,14 @@ public class MySQLDatabaseManager implements DatabaseManager {
                             "additional VARCHAR(1000)" +
                             ");"
             ).execute();
-        } catch (SQLException e) {
+        } catch (Exception e) {
             this.errorHandler(e);
         }
     }
 
     private void errorHandler(Exception e) {
         this.accessControl.setLockdown(true);
-        this.accessControl.getLogger().warning("MySQL Exception: EXCEPTION=" + e + ";STACKTRACE=" + Arrays.toString(e.getStackTrace()) + ";MESSAGE=" + e.getMessage() + ";");
+        this.accessControl.getLogger().warning("DatabaseManager Exception: EXCEPTION=" + e + ";STACKTRACE=" + Arrays.toString(e.getStackTrace()) + ";MESSAGE=" + e.getMessage() + ";");
     }
 
     private List<BanData> createBanData(ResultSet rs) throws SQLException {
@@ -94,7 +94,7 @@ public class MySQLDatabaseManager implements DatabaseManager {
     public List<BanData> getBans() {
         try {
             return this.createBanData(this.connection.prepareStatement("SELECT * FROM bans;").executeQuery());
-        } catch (SQLException e) {
+        } catch (Exception e) {
             this.errorHandler(e);
         }
 
@@ -107,7 +107,7 @@ public class MySQLDatabaseManager implements DatabaseManager {
             PreparedStatement statement = this.connection.prepareStatement("SELECT * FROM bans WHERE player = ?;");
             statement.setString(1, uuid.toString());
             return this.createBanData(statement.executeQuery());
-        } catch (SQLException e) {
+        } catch (Exception e) {
             this.errorHandler(e);
         }
 
@@ -122,7 +122,7 @@ public class MySQLDatabaseManager implements DatabaseManager {
             PreparedStatement statement = this.connection.prepareStatement("SELECT * FROM bans WHERE id = ?;");
             statement.setLong(1, id);
             returnList.addAll(this.createBanData(statement.executeQuery()));
-        } catch (SQLException e) {
+        } catch (Exception e) {
             this.errorHandler(e);
         }
 
@@ -172,7 +172,7 @@ public class MySQLDatabaseManager implements DatabaseManager {
             } else {
                 return -1;
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             this.errorHandler(e);
             return -1;
         }
@@ -196,7 +196,7 @@ public class MySQLDatabaseManager implements DatabaseManager {
             PreparedStatement statement = connection.prepareStatement("DELETE FROM bans WHERE player = ?");
             statement.setString(1, uuid.toString());
             return statement.executeUpdate() != 0;
-        } catch (SQLException e) {
+        } catch (Exception e) {
             this.errorHandler(e);
             return false;
         }
@@ -241,7 +241,7 @@ public class MySQLDatabaseManager implements DatabaseManager {
             statement.setLong(6, banData.getId());
 
             return statement.executeUpdate() != 0;
-        } catch (SQLException e) {
+        } catch (Exception e) {
             this.errorHandler(e);
             return false;
         }

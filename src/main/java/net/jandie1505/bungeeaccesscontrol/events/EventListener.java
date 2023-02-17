@@ -25,12 +25,20 @@ public class EventListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPostLogin(PostLoginEvent event) {
-        if (this.accessControl.isLockdown() && !event.getPlayer().hasPermission(this.accessControl.getConfigManager().getConfig().optJSONObject("permissions", new JSONObject()).optString("bypassLockdown", "accesscontrol.bypass.lockdown"))) {
-            event.getPlayer().disconnect(this.accessControl.getConfigManager().getConfig().optJSONObject("disconnectScreens", new JSONObject()).optString("lockdown", "This network is currently under lockdown"));
+        if (this.accessControl.isLockdown()) {
+
+            if (event.getPlayer().hasPermission(this.accessControl.getConfigManager().getConfig().optJSONObject("permissions", new JSONObject()).optString("bypassLockdown", "accesscontrol.bypass.lockdown"))) {
+                event.getPlayer().sendMessage("§cAutomatic network lockdown active. You are bypassing.");
+            } else {
+                event.getPlayer().disconnect(this.accessControl.getConfigManager().getConfig().optJSONObject("disconnectScreens", new JSONObject()).optString("lockdown", "This network is currently under lockdown"));
+                return;
+            }
+
         }
 
         if (this.accessControl.isMaintenance() && !event.getPlayer().hasPermission(this.accessControl.getConfigManager().getConfig().optJSONObject("permissions", new JSONObject()).optString("bypassMaintenance", "accesscontrol.bypass.maintenance"))) {
             event.getPlayer().disconnect(this.accessControl.getConfigManager().getConfig().optJSONObject("disconnectScreens", new JSONObject()).optString("maintenance", "This network is currently under maintenance"));
+            return;
         }
 
         if (!event.getPlayer().hasPermission(this.accessControl.getConfigManager().getConfig().optJSONObject("permissions", new JSONObject()).optString("unbannable", "accesscontrol.unbannable"))) {
@@ -61,6 +69,7 @@ public class EventListener implements Listener {
                                     "duration", durationString
                             )
                     ));
+                    return;
                 } catch (Exception e) {
                     event.getPlayer().disconnect("You have been banned.\nThere was an error to get additional information.");
                 }
