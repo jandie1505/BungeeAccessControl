@@ -1,5 +1,6 @@
 package net.jandie1505.bungeeaccesscontrol;
 
+import net.jandie1505.bungeeaccesscontrol.commands.ACCommand;
 import net.jandie1505.bungeeaccesscontrol.config.ConfigManager;
 import net.jandie1505.bungeeaccesscontrol.config.DefaultConfigValues;
 import net.jandie1505.bungeeaccesscontrol.database.DatabaseManager;
@@ -28,6 +29,8 @@ public class AccessControl extends Plugin {
         this.configManager = new ConfigManager(this, DefaultConfigValues.getConfig(), "config.json");
         this.databaseManager = new MySQLDatabaseManager(this);
         this.banManager = new BanManager(this);
+
+        this.getProxy().getPluginManager().registerCommand(this, new ACCommand(this));
 
         accessControl = this;
     }
