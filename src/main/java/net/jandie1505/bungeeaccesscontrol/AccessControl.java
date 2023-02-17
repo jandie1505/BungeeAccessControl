@@ -43,6 +43,8 @@ public class AccessControl extends Plugin {
 
     public void setLockdown(boolean lockdown) {
         this.lockdown = lockdown;
+
+        this.getLogger().info("Lockdown status updated: " + this.lockdown);
     }
 
     public boolean isMaintenance() {
@@ -51,6 +53,8 @@ public class AccessControl extends Plugin {
 
     public void setMaintenance(boolean maintenance) {
         this.maintenance = maintenance;
+
+        this.getLogger().info("Maintenance status updated: " + this.maintenance);
     }
 
     public ConfigManager getConfigManager() {
