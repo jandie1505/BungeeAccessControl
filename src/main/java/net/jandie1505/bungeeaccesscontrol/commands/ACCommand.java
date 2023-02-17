@@ -12,6 +12,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class ACCommand extends Command implements TabExecutor {
@@ -530,8 +531,154 @@ public class ACCommand extends Command implements TabExecutor {
                         sender.sendMessage(accessControl.getConfigManager().getConfig().optJSONObject("messages", new JSONObject()).optString("nopermission", "No permission"));
                     }
 
-                } else if (args[0].equalsIgnoreCase("help")) {
+                } else if (args[0].equalsIgnoreCase("cache")) {
 
+                    if (sender.hasPermission(accessControl.getConfigManager().getConfig().optJSONObject("command", new JSONObject()).optJSONObject("permissions", new JSONObject()).optString("cache", "accesscontrol.command.cache"))) {
+
+                        if (args.length > 1) {
+
+                            if (args[1].equalsIgnoreCase("list")) {
+
+                                Map<UUID, String> cachedPlayers = this.accessControl.getPlayerCacheManager().getCachedPlayers();
+
+                                String response = "Cached players:\n";
+
+                                for (UUID cachedUUID : cachedPlayers.keySet()) {
+                                    response = response + "uuid=" + cachedUUID + ";name=" + cachedPlayers.get(cachedUUID) + "\n";
+                                }
+
+                                sender.sendMessage(response);
+
+                            } else if (args[1].equalsIgnoreCase("add")) {
+
+                                if (this.accessControl.getConfigManager().getConfig().optJSONObject("command", new JSONObject()).optBoolean("allowCacheAddCommand", false)) {
+
+                                    if (args.length > 3) {
+
+                                        try {
+
+                                            boolean success = this.accessControl.getPlayerCacheManager().cachePlayer(UUID.fromString(args[2]), args[3]);
+
+                                            if (success) {
+                                                sender.sendMessage("Player successfully cached");
+                                            } else {
+                                                sender.sendMessage("Error while caching player");
+                                            }
+
+                                        } catch (IllegalArgumentException e) {
+                                            sender.sendMessage("Please enter a valid UUID");
+                                        }
+
+                                    } else {
+                                        sender.sendMessage("Usage: /" + this.getName() + " cache add <uuid> <name>");
+                                    }
+
+                                } else {
+                                    sender.sendMessage("Please enable allowCacheAddCommand in config to use this command");
+                                }
+
+                            } else if (args[1].equalsIgnoreCase("getUUID")) {
+
+                                if (args.length > 2) {
+
+                                    UUID uuid = this.accessControl.getPlayerCacheManager().getCachedPlayer(args[2]);
+
+                                    if (uuid != null) {
+                                        sender.sendMessage("UUID of " + args[2] + " is " + uuid);
+                                    } else {
+                                        sender.sendMessage("Cached name not found");
+                                    }
+
+                                } else {
+                                    sender.sendMessage("Usage: /" + this.getName() + " cache getUUID <name>");
+                                }
+
+                            } else if (args[1].equalsIgnoreCase("getName")) {
+
+                                if (args.length > 2) {
+
+                                    try {
+                                        String name = this.accessControl.getPlayerCacheManager().getCachedPlayer(UUID.fromString(args[2]));
+
+                                        if (name != null) {
+                                            sender.sendMessage("Name of UUID + " + args[2] + ": " + name);
+                                        } else {
+                                            sender.sendMessage("Cached uuid not found");
+                                        }
+                                    } catch (IllegalArgumentException e) {
+                                        sender.sendMessage("Please specify a valid uuid");
+                                    }
+
+                                } else {
+                                    sender.sendMessage("Usage: /" + this.getName() + " cache getName <uuid>");
+                                }
+
+                            } else if (args[1].equalsIgnoreCase("remove")) {
+
+                                if (args.length > 2) {
+
+                                    try {
+
+                                        boolean success = this.accessControl.getPlayerCacheManager().deleteCachedPlayer(UUID.fromString(args[2]));
+
+                                        if (success) {
+                                            sender.sendMessage("Cached player with UUID " + args[2] + " was deleted");
+                                        } else {
+                                            sender.sendMessage("Error while deleting uuid");
+                                        }
+
+                                    } catch (IllegalArgumentException e) {
+                                        sender.sendMessage("Please specify a valid uuid");
+                                    }
+
+                                } else {
+                                    sender.sendMessage("Usage: /" + this.getName() + " cache remove <uuid>");
+                                }
+
+                            } else if (args[1].equalsIgnoreCase("clear")) {
+
+                                if (args.length > 2) {
+
+                                    if (args[2].equalsIgnoreCase("confirm")) {
+
+                                        boolean success = this.accessControl.getPlayerCacheManager().clearCachedPlayers();
+
+                                        if (success) {
+                                            sender.sendMessage("Successfully cleared player cache");
+                                        } else {
+                                            sender.sendMessage("Error while clearing player cache");
+                                        }
+
+                                    } else {
+                                        sender.sendMessage("Invalid argument");
+                                    }
+
+                                } else {
+                                    sender.sendMessage("Usage: /" + this.getName() + " cache clear confirm");
+                                }
+
+                            } else {
+                                sender.sendMessage("Invalid subcommand");
+                            }
+
+                        } else {
+                            sender.sendMessage("Usage: /" + this.getName() + " cache <list/add/getUUID/getName/remove/clear> [...]");
+                        }
+
+                    } else {
+                        sender.sendMessage(accessControl.getConfigManager().getConfig().optJSONObject("messages", new JSONObject()).optString("nopermission", "No permission"));
+                    }
+
+                } else if (args[0].equalsIgnoreCase("help")) {
+                    sender.sendMessage("Available subcommands:\n" +
+                            "/" + this.getName() + " ban - manage bans\n" +
+                            "/" + this.getName() + " kick - kick players\n" +
+                            "/" + this.getName() + " maintenance - manage maintenance mode\n" +
+                            "/" + this.getName() + " lockdown - manage lockdown mode\n" +
+                            "/" + this.getName() + " cache - manage player cache\n" +
+                            "/" + this.getName() + " help - show this page\n" +
+                            "Run these subcommands without arguments to get more detailed information about them.\n"
+                    );
                 } else {
                     sender.sendMessage(this.UNKNOWN_COMMAND);
                 }
@@ -558,6 +705,7 @@ public class ACCommand extends Command implements TabExecutor {
                 tabCompletions.add("kick");
                 tabCompletions.add("maintenance");
                 tabCompletions.add("lockdown");
+                tabCompletions.add("cache");
                 tabCompletions.add("help");
 
             } else if (args.length == 2) {
@@ -591,6 +739,17 @@ public class ACCommand extends Command implements TabExecutor {
                     tabCompletions.add("test");
                     tabCompletions.add("reset");
                     tabCompletions.add("status");
+
+                } else if (args[0].equalsIgnoreCase("cache")) {
+
+                    tabCompletions.add("list");
+                    if (this.accessControl.getConfigManager().getConfig().optJSONObject("command", new JSONObject()).optBoolean("allowCacheAddCommand", false)) {
+                        tabCompletions.add("add");
+                    }
+                    tabCompletions.add("getUUID");
+                    tabCompletions.add("getName");
+                    tabCompletions.add("remove");
+                    tabCompletions.add("clear");
 
                 }
 

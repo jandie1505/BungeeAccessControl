@@ -7,6 +7,7 @@ import net.jandie1505.bungeeaccesscontrol.database.DatabaseManager;
 import net.jandie1505.bungeeaccesscontrol.database.managers.MySQLDatabaseManager;
 import net.jandie1505.bungeeaccesscontrol.events.EventListener;
 import net.jandie1505.bungeeaccesscontrol.managers.BanManager;
+import net.jandie1505.bungeeaccesscontrol.managers.PlayerCacheManager;
 import net.md_5.bungee.api.plugin.Plugin;
 
 public class AccessControl extends Plugin {
@@ -18,6 +19,7 @@ public class AccessControl extends Plugin {
     private ConfigManager configManager;
     private DatabaseManager databaseManager;
     private BanManager banManager;
+    private PlayerCacheManager playerCacheManager;
     private boolean lockdown;
     private boolean maintenance;
 
@@ -32,6 +34,7 @@ public class AccessControl extends Plugin {
         this.configManager.reloadConfig();
         this.databaseManager = new MySQLDatabaseManager(this);
         this.banManager = new BanManager(this);
+        this.playerCacheManager = new PlayerCacheManager(this);
 
         this.getProxy().getPluginManager().registerListener(this, new EventListener(this));
         this.getProxy().getPluginManager().registerCommand(this, new ACCommand(this));
@@ -71,6 +74,10 @@ public class AccessControl extends Plugin {
 
     public BanManager getBanManager() {
         return this.banManager;
+    }
+
+    public PlayerCacheManager getPlayerCacheManager() {
+        return this.playerCacheManager;
     }
 
     // STATIC
