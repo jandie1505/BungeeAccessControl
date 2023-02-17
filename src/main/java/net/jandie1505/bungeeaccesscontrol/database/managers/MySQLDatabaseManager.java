@@ -6,10 +6,7 @@ import net.jandie1505.bungeeaccesscontrol.database.data.BanData;
 import org.json.JSONObject;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class MySQLDatabaseManager implements DatabaseManager {
     private final AccessControl accessControl;
@@ -89,6 +86,148 @@ public class MySQLDatabaseManager implements DatabaseManager {
 
         return List.copyOf(returnList);
     }
+
+    // PLAYER CACHE
+
+    @Override
+    public Map<UUID, String> getCachedPlayers() {
+        Map<UUID, String> returnMap = new HashMap<>();
+
+        try {
+
+            ResultSet rs = this.connection.prepareStatement("SELECT * FROM cache;").executeQuery();
+
+            while (rs.next()) {
+                try {
+                    returnMap.put(UUID.fromString(rs.getString("uuid")), rs.getString("name"));
+                } catch (IllegalArgumentException ignored) {
+                    // ignored
+                }
+            }
+
+        } catch (Exception e) {
+            this.errorHandler(e);
+        }
+
+        return Map.copyOf(returnMap);
+    }
+
+    @Override
+    public String getCachedPlayerName(UUID uuid) {
+        try {
+
+            PreparedStatement statement = this.connection.prepareStatement("SELECT name FROM cache WHERE uuid = ?;");
+            statement.setString(1, uuid.toString());
+            ResultSet rs = statement.executeQuery();
+
+            if (rs.next()) {
+                return rs.getString("name");
+            } else {
+                return null;
+            }
+
+        } catch (Exception e) {
+            this.errorHandler(e);
+            return null;
+        }
+    }
+
+    @Override
+    public UUID getCachedPlayerUUID(String name) {
+        try {
+
+            PreparedStatement statement = this.connection.prepareStatement("SELECT name FROM cache WHERE name = ?;");
+            statement.setString(1, name);
+            ResultSet rs = statement.executeQuery();
+
+            if (rs.next()) {
+                try {
+                    return UUID.fromString(rs.getString("uuid"));
+                } catch (IllegalArgumentException e) {
+                    return null;
+                }
+            } else {
+                return null;
+            }
+
+        } catch (Exception e) {
+            this.errorHandler(e);
+            return null;
+        }
+    }
+
+    @Override
+    public boolean cachePlayer(UUID uuid, String name) {
+        try {
+
+            PreparedStatement statement1 = this.connection.prepareStatement("SELECT * FROM cache WHERE uuid = ? OR player = ?;");
+            statement1.setString(1, uuid.toString());
+            statement1.setString(2, name);
+            ResultSet rs1 = statement1.executeQuery();
+
+            Map<UUID, String> cachedEntries = new HashMap<>();
+            while (rs1.next()) {
+                try {
+                    cachedEntries.put(UUID.fromString(rs1.getString("uuid")), rs1.getString("name"));
+                } catch (IllegalArgumentException ignored) {
+                    // ignored
+                }
+            }
+
+            for (UUID cachedUUID : Map.copyOf(cachedEntries).keySet()) {
+
+                if (!cachedUUID.equals(uuid)) {
+                    PreparedStatement statement2 = this.connection.prepareStatement("DELETE FROM cache WHERE uuid = ?;");
+                    statement2.setString(1, cachedUUID.toString());
+                    statement2.executeUpdate();
+                }
+
+                if (!cachedEntries.get(cachedUUID).equals(name)) {
+                    PreparedStatement statement2 = this.connection.prepareStatement("DELETE FROM cache WHERE uuid = ?;");
+                    statement2.setString(1, cachedUUID.toString());
+                    statement2.executeUpdate();
+                }
+
+            }
+
+            PreparedStatement statement2 = this.connection.prepareStatement("INSERT INTO cache (uuid, name) VALUES (?,?);");
+            statement2.setString(1, uuid.toString());
+            statement2.setString(2, name);
+            return statement2.executeUpdate() != 0;
+
+        } catch (Exception e) {
+            this.errorHandler(e);
+            return false;
+        }
+    }
+
+    @Override
+    public boolean deleteCachedPlayer(UUID uuid) {
+        try {
+
+            PreparedStatement statement = this.connection.prepareStatement("DELETE FROM cache WHERE uuid = ?;");
+            statement.setString(1, uuid.toString());
+            return statement.executeUpdate() != 0;
+
+        } catch (Exception e) {
+            this.errorHandler(e);
+            return false;
+        }
+    }
+
+    @Override
+    public boolean clearCachedPlayers() {
+        try {
+
+            return this.connection.prepareStatement("DELETE FROM cache;").executeUpdate() != 0;
+
+        } catch (Exception e) {
+            this.errorHandler(e);
+            return false;
+        }
+    }
+
+    // BANS
 
     @Override
     public List<BanData> getBans() {

@@ -3,9 +3,22 @@ package net.jandie1505.bungeeaccesscontrol.database;
 import net.jandie1505.bungeeaccesscontrol.database.data.BanData;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public interface DatabaseManager {
+    Map<UUID, String> getCachedPlayers();
+
+    String getCachedPlayerName(UUID uuid);
+
+    UUID getCachedPlayerUUID(String name);
+
+    boolean cachePlayer(UUID uuid, String name);
+
+    boolean deleteCachedPlayer(UUID uuid);
+
+    boolean clearCachedPlayers();
+
     List<BanData> getBans();
 
     List<BanData> getBans(UUID uuid);
