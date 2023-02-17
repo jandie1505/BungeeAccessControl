@@ -30,7 +30,8 @@ public class ACCommand extends Command implements TabExecutor {
         this.TIME_FORMAT_ERROR = "Please specify a valid time string:\n" +
                 "Time format: <prefix><time>\n" +
                 "<time> is a time in seconds.\n" +
-                "<prefix> is r for relative time (r30: ban for 30 seconds) or a for absolute unix time (a1676390535: ban until 1676390535 seconds after 1st Jan 1970).";
+                "<prefix> is r for relative time (r30: ban for 30 seconds) or a for absolute unix time (a1676390535: ban until 1676390535 seconds after 1st Jan 1970).\n" +
+                "You can also set the time to permanent by writing null, - or permanent.";
     }
 
     @Override
@@ -125,7 +126,7 @@ public class ACCommand extends Command implements TabExecutor {
                                                 time = Utilities.createTimeFromInput(timeString);
                                             }
 
-                                            if (time != null && time >= 0) {
+                                            if (time == null || time >= 0) {
 
                                                 if (args.length > 4) {
 
@@ -210,7 +211,7 @@ public class ACCommand extends Command implements TabExecutor {
                                                     time = Utilities.createTimeFromInput(args[4]);
                                                 }
 
-                                                if (time != null && time >= 0) {
+                                                if (time == null || time >= 0) {
                                                     ban.setEndTime(time);
                                                 } else {
                                                     sender.sendMessage(this.TIME_FORMAT_ERROR);
