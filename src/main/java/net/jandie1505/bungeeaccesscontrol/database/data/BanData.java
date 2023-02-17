@@ -1,6 +1,5 @@
 package net.jandie1505.bungeeaccesscontrol.database.data;
 
-import java.time.Instant;
 import java.util.UUID;
 
 public class BanData {

@@ -20,9 +20,10 @@ public class BanManager {
 
     /**
      * Ban a player.
+     *
      * @param playerId the player that should be banned (null will return -1 and do nothing)
-     * @param endTime the timestamp the player should be unbanned (null for permanent)
-     * @param reason the reason the player should be banned for (null for no reason)
+     * @param endTime  the timestamp the player should be unbanned (null for permanent)
+     * @param reason   the reason the player should be banned for (null for no reason)
      * @return ban id
      */
     public long banPlayer(UUID playerId, Long endTime, String reason, JSONObject additionalInfos) {
@@ -56,6 +57,7 @@ public class BanManager {
      * This method will set one specific ban cancelled.
      * This will not delete the ban.
      * If there is more than one active ban for a player, the player will not be unbanned.
+     *
      * @param banId ban id (not player)
      * @return success
      */
@@ -75,6 +77,7 @@ public class BanManager {
      * Unbans a player.
      * This method will set ALL BANS of the specified player cancelled.
      * This will not delete the bans.
+     *
      * @param playerId player UUID
      * @return success
      */
@@ -94,6 +97,7 @@ public class BanManager {
 
     /**
      * Get a ban by id.
+     *
      * @param id ban id (not player uuid)
      * @return Ban
      */
@@ -121,6 +125,7 @@ public class BanManager {
 
     /**
      * Get a list of all bans.
+     *
      * @return list of all bans
      */
     public List<Ban> getBans() {
@@ -133,8 +138,10 @@ public class BanManager {
 
         return List.copyOf(banList);
     }
+
     /**
      * Get a list of all bans of a specific player.
+     *
      * @param playerId player UUID
      * @return list of bans
      */
@@ -151,6 +158,7 @@ public class BanManager {
 
     /**
      * Get all active bans.
+     *
      * @return list of bans
      */
     public List<Ban> getActiveBans() {
@@ -167,6 +175,7 @@ public class BanManager {
 
     /**
      * Get all active bans of a specific player.
+     *
      * @param playerId player UUID
      * @return list of bans
      */
@@ -184,6 +193,7 @@ public class BanManager {
 
     /**
      * Edit a ban.
+     *
      * @param ban ban object
      * @return success
      */
@@ -205,6 +215,7 @@ public class BanManager {
 
     /**
      * Delete a ban.
+     *
      * @param id ban id
      * @return success
      */
@@ -214,6 +225,7 @@ public class BanManager {
 
     /**
      * Delete all bans of a specific player.
+     *
      * @param player player UUID
      * @return success
      */

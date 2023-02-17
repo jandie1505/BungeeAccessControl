@@ -7,6 +7,7 @@ import java.util.UUID;
 
 public interface DatabaseManager {
     List<BanData> getBans();
+
     List<BanData> getBans(UUID uuid);
 
     BanData getBan(long id);

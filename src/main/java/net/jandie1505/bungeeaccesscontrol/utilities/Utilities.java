@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 public class Utilities {
     public static String replacePlaceholders(String message, Map<String, String> placeholders) {
@@ -35,7 +34,7 @@ public class Utilities {
 
     public static String createRemainingTime(long input, String timeString) {
         long days = input / 86400;
-        long hours = (input % 86400) / 3600 ;
+        long hours = (input % 86400) / 3600;
         long minutes = ((input % 86400) % 3600) / 60;
         long seconds = ((input % 86400) % 3600) % 60;
 

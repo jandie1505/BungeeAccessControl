@@ -80,6 +80,7 @@ public class Ban implements Comparable<Ban> {
 
     /**
      * Returns if a ban is active or not
+     *
      * @return boolean
      */
     public boolean isActive() {

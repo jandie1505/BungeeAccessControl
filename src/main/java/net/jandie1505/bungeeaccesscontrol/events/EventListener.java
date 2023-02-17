@@ -1,7 +1,6 @@
 package net.jandie1505.bungeeaccesscontrol.events;
 
 import net.jandie1505.bungeeaccesscontrol.AccessControl;
-import net.jandie1505.bungeeaccesscontrol.database.data.BanData;
 import net.jandie1505.bungeeaccesscontrol.managers.data.Ban;
 import net.jandie1505.bungeeaccesscontrol.utilities.Utilities;
 import net.md_5.bungee.api.event.PostLoginEvent;
@@ -12,7 +11,6 @@ import org.json.JSONObject;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 

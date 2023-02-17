@@ -10,9 +10,7 @@ import net.md_5.bungee.api.plugin.TabExecutor;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -38,7 +36,7 @@ public class ACCommand extends Command implements TabExecutor {
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (sender.hasPermission(accessControl.getConfigManager().getConfig().optJSONObject("command", new JSONObject()).optJSONObject("permissions", new JSONObject()).optString("base", "accesscontrol.command"))) {
-            
+
             if (args.length > 0) {
 
                 if (args[0].equalsIgnoreCase("ban")) {
@@ -71,7 +69,7 @@ public class ACCommand extends Command implements TabExecutor {
                                 }
 
                                 for (Ban ban : bans) {
-                                    reply = reply + "id=" + ban.getId() + ";player=" + ban.getPlayer().toString() + ";endTime=" + ban.getEndTime() + "cancelled=" + ban.isCancelled() + "\n" ;
+                                    reply = reply + "id=" + ban.getId() + ";player=" + ban.getPlayer().toString() + ";endTime=" + ban.getEndTime() + "cancelled=" + ban.isCancelled() + "\n";
                                 }
 
                                 sender.sendMessage(reply);
