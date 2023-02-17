@@ -113,37 +113,17 @@ public class MySQLDatabaseManager implements DatabaseManager {
     }
 
     @Override
-    public String getCachedPlayerName(UUID uuid) {
+    public String getCachedPlayers(UUID uuid) {
         try {
 
-            PreparedStatement statement = this.connection.prepareStatement("SELECT name FROM cache WHERE uuid = ?;");
+            PreparedStatement statement = this.connection.prepareStatement("SELECT * FROM cache WHERE uuid = ?;");
             statement.setString(1, uuid.toString());
             ResultSet rs = statement.executeQuery();
 
             if (rs.next()) {
-                return rs.getString("name");
-            } else {
-                return null;
-            }
-
-        } catch (Exception e) {
-            this.errorHandler(e);
-            return null;
-        }
-    }
-
-    @Override
-    public UUID getCachedPlayerUUID(String name) {
-        try {
-
-            PreparedStatement statement = this.connection.prepareStatement("SELECT name FROM cache WHERE name = ?;");
-            statement.setString(1, name);
-            ResultSet rs = statement.executeQuery();
-
-            if (rs.next()) {
                 try {
-                    return UUID.fromString(rs.getString("uuid"));
-                } catch (IllegalArgumentException e) {
+                    return rs.getString("name");
+                } catch (IllegalArgumentException ignored) {
                     return null;
                 }
             } else {
@@ -157,43 +137,48 @@ public class MySQLDatabaseManager implements DatabaseManager {
     }
 
     @Override
-    public boolean cachePlayer(UUID uuid, String name) {
+    public Map<UUID, String> getCachedPlayers(String name) {
+        Map<UUID, String> returnMap = new HashMap<>();
+
         try {
 
-            PreparedStatement statement1 = this.connection.prepareStatement("SELECT * FROM cache WHERE uuid = ? OR player = ?;");
-            statement1.setString(1, uuid.toString());
-            statement1.setString(2, name);
-            ResultSet rs1 = statement1.executeQuery();
+            PreparedStatement statement = this.connection.prepareStatement("SELECT * FROM cache WHERE name = ?;");
+            statement.setString(1, name);
+            ResultSet rs = statement.executeQuery();
 
-            Map<UUID, String> cachedEntries = new HashMap<>();
-            while (rs1.next()) {
+            while (rs.next()) {
                 try {
-                    cachedEntries.put(UUID.fromString(rs1.getString("uuid")), rs1.getString("name"));
+                    returnMap.put(UUID.fromString(rs.getString("uuid")), rs.getString("name"));
                 } catch (IllegalArgumentException ignored) {
                     // ignored
                 }
             }
 
-            for (UUID cachedUUID : Map.copyOf(cachedEntries).keySet()) {
+        } catch (Exception e) {
+            this.errorHandler(e);
+        }
 
-                if (!cachedUUID.equals(uuid)) {
-                    PreparedStatement statement2 = this.connection.prepareStatement("DELETE FROM cache WHERE uuid = ?;");
-                    statement2.setString(1, cachedUUID.toString());
-                    statement2.executeUpdate();
-                }
+        return Map.copyOf(returnMap);
+    }
 
-                if (!cachedEntries.get(cachedUUID).equals(name)) {
-                    PreparedStatement statement2 = this.connection.prepareStatement("DELETE FROM cache WHERE uuid = ?;");
-                    statement2.setString(1, cachedUUID.toString());
-                    statement2.executeUpdate();
-                }
+    @Override
+    public boolean cachePlayer(UUID uuid, String name) {
+        try {
 
+            PreparedStatement statement1 = this.connection.prepareStatement("SELECT * FROM cache WHERE uuid = ?;");
+            statement1.setString(1, uuid.toString());
+            ResultSet rs1 = statement1.executeQuery();
+
+            if (!rs1.next()) {
+
+                PreparedStatement statement2 = this.connection.prepareStatement("INSERT INTO cache (uuid, name) VALUES (?,?);");
+                statement2.setString(1, uuid.toString());
+                statement2.setString(2, name);
+                return statement2.executeUpdate() != 0;
+
+            } else {
+                return false;
             }
-
-            PreparedStatement statement2 = this.connection.prepareStatement("INSERT INTO cache (uuid, name) VALUES (?,?);");
-            statement2.setString(1, uuid.toString());
-            statement2.setString(2, name);
-            return statement2.executeUpdate() != 0;
 
         } catch (Exception e) {
             this.errorHandler(e);

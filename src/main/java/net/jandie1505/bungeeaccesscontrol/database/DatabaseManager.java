@@ -9,9 +9,9 @@ import java.util.UUID;
 public interface DatabaseManager {
     Map<UUID, String> getCachedPlayers();
 
-    String getCachedPlayerName(UUID uuid);
+    String getCachedPlayers(UUID uuid);
 
-    UUID getCachedPlayerUUID(String name);
+    Map<UUID, String> getCachedPlayers(String name);
 
     boolean cachePlayer(UUID uuid, String name);
 
