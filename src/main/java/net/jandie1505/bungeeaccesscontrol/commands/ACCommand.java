@@ -490,7 +490,7 @@ public class ACCommand extends Command implements TabExecutor {
                             }
 
                         } else {
-                            sender.sendMessage("Usage: /" + this.getName() + " maintenance <enable/disable/setReason>");
+                            sender.sendMessage("Usage: /" + this.getName() + " maintenance <enable/disable/status>");
                         }
 
                     } else {
