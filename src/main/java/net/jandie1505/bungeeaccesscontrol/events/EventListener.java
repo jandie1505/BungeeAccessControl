@@ -2,17 +2,11 @@ package net.jandie1505.bungeeaccesscontrol.events;
 
 import net.jandie1505.bungeeaccesscontrol.AccessControl;
 import net.jandie1505.bungeeaccesscontrol.managers.data.Ban;
-import net.jandie1505.bungeeaccesscontrol.utilities.Utilities;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
 import org.json.JSONObject;
-
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 public class EventListener implements Listener {
     private final AccessControl accessControl;

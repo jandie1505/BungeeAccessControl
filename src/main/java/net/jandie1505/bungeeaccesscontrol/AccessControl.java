@@ -10,15 +10,11 @@ import net.jandie1505.bungeeaccesscontrol.managers.BanManager;
 import net.jandie1505.bungeeaccesscontrol.managers.MaintenanceManager;
 import net.jandie1505.bungeeaccesscontrol.managers.PlayerCacheManager;
 import net.jandie1505.bungeeaccesscontrol.managers.data.Ban;
-import net.jandie1505.bungeeaccesscontrol.utilities.Utilities;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import org.json.JSONObject;
 
-import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class AccessControl extends Plugin {
