@@ -80,7 +80,6 @@ public class PlayerCacheManager {
      */
     public boolean cachePlayer(UUID uuid, String name) {
         String nameBefore = this.accessControl.getDatabaseManager().getCachedPlayers(uuid);
-        Map<UUID, String> uuidsBefore = this.accessControl.getDatabaseManager().getCachedPlayers(name);
 
         if (nameBefore != null) {
             if (!this.accessControl.getDatabaseManager().deleteCachedPlayer(uuid)) {
@@ -88,8 +87,10 @@ public class PlayerCacheManager {
             }
         }
 
+        Map<UUID, String> uuidsBefore = this.accessControl.getDatabaseManager().getCachedPlayers(name);
+
         for (UUID iuuid : uuidsBefore.keySet()) {
-            if (!this.accessControl.getDatabaseManager().deleteCachedPlayer(uuid)) {
+            if (!this.accessControl.getDatabaseManager().deleteCachedPlayer(iuuid)) {
                 return false;
             }
         }
