@@ -417,38 +417,68 @@ public class ACCommand extends Command implements TabExecutor {
 
                         if (args.length > 1) {
 
-                            ProxiedPlayer player;
+                            if (args[1].equalsIgnoreCase("*")) {
 
-                            try {
-                                UUID playerUUid = UUID.fromString(args[1]);
+                                for (ProxiedPlayer player : List.copyOf(this.accessControl.getProxy().getPlayers())) {
+                                    if (player != null && player != sender) {
 
-                                player = this.accessControl.getProxy().getPlayer(playerUUid);
-                            } catch (IllegalArgumentException e) {
-                                player = this.accessControl.getProxy().getPlayer(args[1]);
-                            }
+                                        if (args.length > 2) {
 
-                            if (player != null) {
+                                            String reason = "";
 
-                                if (args.length > 2) {
+                                            for (int i = 2; i < args.length; i++) {
+                                                reason = reason + args[i];
+                                            }
 
-                                    String reason = "";
+                                            player.disconnect(reason);
+                                            sender.sendMessage("Kicked all players");
 
-                                    for (int i = 2; i < args.length; i++) {
-                                        reason = reason + args[i];
+                                        } else {
+                                            player.disconnect();
+                                            sender.sendMessage("Kicked all players");
+                                        }
+
                                     }
-
-                                    player.disconnect(reason);
-
-                                } else {
-                                    player.disconnect();
                                 }
 
                             } else {
-                                sender.sendMessage("Player is offline");
+
+                                ProxiedPlayer player;
+
+                                try {
+                                    UUID playerUUid = UUID.fromString(args[1]);
+
+                                    player = this.accessControl.getProxy().getPlayer(playerUUid);
+                                } catch (IllegalArgumentException e) {
+                                    player = this.accessControl.getProxy().getPlayer(args[1]);
+                                }
+
+                                if (player != null) {
+
+                                    if (args.length > 2) {
+
+                                        String reason = "";
+
+                                        for (int i = 2; i < args.length; i++) {
+                                            reason = reason + args[i];
+                                        }
+
+                                        player.disconnect(reason);
+                                        sender.sendMessage("Kicked player");
+
+                                    } else {
+                                        player.disconnect();
+                                        sender.sendMessage("Kicked player");
+                                    }
+
+                                } else {
+                                    sender.sendMessage("Player is offline");
+                                }
+
                             }
 
                         } else {
-                            sender.sendMessage("Usage: /" + this.getName() + " kick <player>");
+                            sender.sendMessage("Usage: /" + this.getName() + " kick <*/player>");
                         }
 
                     } else {
