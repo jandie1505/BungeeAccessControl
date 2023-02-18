@@ -35,6 +35,12 @@ public class MySQLDatabaseManager implements DatabaseManager {
             ).execute();
 
             this.connection.prepareStatement(
+                    "CREATE TABLE IF NOT EXISTS maintenance (" +
+                            "status BOOLEAN NOT NULL" +
+                            ");"
+            ).execute();
+
+            this.connection.prepareStatement(
                     "CREATE TABLE IF NOT EXISTS bans (" +
                             "id BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT," +
                             "player VARCHAR(255) NOT NULL," +
@@ -205,6 +211,52 @@ public class MySQLDatabaseManager implements DatabaseManager {
         try {
 
             return this.connection.prepareStatement("DELETE FROM cache;").executeUpdate() != 0;
+
+        } catch (Exception e) {
+            this.errorHandler(e);
+            return false;
+        }
+    }
+
+    // MAINTENANCE
+
+    @Override
+    public boolean setMaintenanceStatus(boolean status) {
+        try {
+
+            ResultSet rs = this.connection.prepareStatement("SELECT * FROM maintenance;").executeQuery();
+
+            if (rs.next()) {
+
+                PreparedStatement statement = this.connection.prepareStatement("UPDATE maintenance SET status = ?;");
+                statement.setBoolean(1, status);
+                return statement.executeUpdate() != 0;
+
+            } else {
+
+                PreparedStatement statement = this.connection.prepareStatement("INSERT INTO maintenance (status) VALUES (?);");
+                statement.setBoolean(1, status);
+                return statement.executeUpdate() != 0;
+
+            }
+
+        } catch (Exception e) {
+            this.errorHandler(e);
+            return false;
+        }
+    }
+
+    @Override
+    public boolean getMaintenanceStatus() {
+        try {
+
+            ResultSet rs = this.connection.prepareStatement("SELECT * FROM maintenance;").executeQuery();
+
+            if (rs.next()) {
+                return rs.getBoolean("status");
+            } else {
+                return false;
+            }
 
         } catch (Exception e) {
             this.errorHandler(e);

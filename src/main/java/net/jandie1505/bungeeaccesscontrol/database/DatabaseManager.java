@@ -19,6 +19,10 @@ public interface DatabaseManager {
 
     boolean clearCachedPlayers();
 
+    boolean setMaintenanceStatus(boolean status);
+
+    boolean getMaintenanceStatus();
+
     List<BanData> getBans();
 
     List<BanData> getBans(UUID uuid);

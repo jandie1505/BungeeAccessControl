@@ -463,29 +463,27 @@ public class ACCommand extends Command implements TabExecutor {
 
                             if (args[1].equalsIgnoreCase("enable")) {
 
-                                this.accessControl.setMaintenance(true);
-                                sender.sendMessage("Maintenance mode enabled");
+                                boolean success = this.accessControl.getMaintenanceManager().enableMaintenance();
+
+                                if (success) {
+                                    sender.sendMessage("Maintenance mode enabled");
+                                } else {
+                                    sender.sendMessage("Error while enabling maintenance mode");
+                                }
 
                             } else if (args[1].equalsIgnoreCase("disable")) {
 
-                                this.accessControl.setMaintenance(false);
-                                sender.sendMessage("Maintenance mode disabled");
+                                boolean success = this.accessControl.getMaintenanceManager().disableMaintenance();
 
-                            } else if (args[1].equalsIgnoreCase("setReason")) {
-
-                                if (args.length > 2) {
-
-                                    String reason = "";
-
-                                    for (int i = 2; i < args.length; i++) {
-                                        reason = reason + args[i];
-                                    }
-
-                                    sender.sendMessage("Currently unsupported");
-
+                                if (success) {
+                                    sender.sendMessage("Maintenance mode disabled");
                                 } else {
-                                    sender.sendMessage("Usage: /" + this.getName() + " maintenance setReason <reason>");
+                                    sender.sendMessage("Error while enabling maintenance mode");
                                 }
+
+                            } else if (args[1].equalsIgnoreCase("status")) {
+
+                                sender.sendMessage("Current maintenance status: " + this.accessControl.getMaintenanceManager().getMaintenanceStatus());
 
                             } else {
                                 sender.sendMessage("Invalid subcommand");
@@ -732,7 +730,6 @@ public class ACCommand extends Command implements TabExecutor {
                     tabCompletions.add("enable");
                     tabCompletions.add("disable");
                     tabCompletions.add("status");
-                    tabCompletions.add("setReason");
 
                 } else if (args[0].equalsIgnoreCase("lockdown")) {
 
