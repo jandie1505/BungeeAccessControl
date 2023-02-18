@@ -61,6 +61,13 @@ public final class DefaultConfigValues {
         messagesConfig.put("noPermission", "No permission!");
         config.put("messages", messagesConfig);
 
+        JSONObject enforceConfig = new JSONObject();
+        enforceConfig.put("lockdown", true);
+        enforceConfig.put("maintenance", false);
+        //enforceConfig.put("bans", false);
+        enforceConfig.put("time", 60);
+        config.put("enforce", enforceConfig);
+
         config.put("playerCaching", true);
 
         return config;

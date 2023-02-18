@@ -40,14 +40,12 @@ public class EventListener implements Listener {
         }
 
         if (!event.getPlayer().hasPermission(this.accessControl.getConfigManager().getConfig().optJSONObject("permissions", new JSONObject()).optString("unbannable", "accesscontrol.unbannable"))) {
-            List<Ban> activeBans = new ArrayList<>(this.accessControl.getBanManager().getActiveBans(event.getPlayer().getUniqueId()));
+            Ban usedBan = this.accessControl.getBanManager().getLongestBan(event.getPlayer().getUniqueId());
 
-            if (!activeBans.isEmpty()) {
-                activeBans.sort(null);
-
-                Ban usedBan = activeBans.get(activeBans.size() - 1);
+            if (usedBan != null) {
 
                 try {
+
                     String untilString;
                     String durationString;
 
@@ -67,10 +65,11 @@ public class EventListener implements Listener {
                                     "duration", durationString
                             )
                     ));
-                    return;
+
                 } catch (Exception e) {
                     event.getPlayer().disconnect("You have been banned.\nThere was an error to get additional information.");
                 }
+
             }
         }
 

@@ -232,4 +232,16 @@ public class BanManager {
     public boolean deleteBans(UUID player) {
         return this.accessControl.getDatabaseManager().clearBans(player);
     }
+
+    public Ban getLongestBan(UUID player) {
+        List<Ban> activeBans = new ArrayList<>(this.accessControl.getBanManager().getActiveBans(player));
+
+        if (!activeBans.isEmpty()) {
+            activeBans.sort(null);
+
+            return activeBans.get(activeBans.size() - 1);
+        } else {
+            return null;
+        }
+    }
 }

@@ -9,7 +9,17 @@ import net.jandie1505.bungeeaccesscontrol.events.EventListener;
 import net.jandie1505.bungeeaccesscontrol.managers.BanManager;
 import net.jandie1505.bungeeaccesscontrol.managers.MaintenanceManager;
 import net.jandie1505.bungeeaccesscontrol.managers.PlayerCacheManager;
+import net.jandie1505.bungeeaccesscontrol.managers.data.Ban;
+import net.jandie1505.bungeeaccesscontrol.utilities.Utilities;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
+import org.json.JSONObject;
+
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class AccessControl extends Plugin {
     public static final String VERSION = "1.0";
@@ -26,9 +36,16 @@ public class AccessControl extends Plugin {
 
     @Override
     public void onEnable() {
+
+        // START MESSAGE
+
         this.getLogger().info("Enabling BungeeAccessControl...");
 
+        // LOCKDOWN STATUS
+
         this.lockdown = false;
+
+        // MANAGER OBJECTS
 
         this.configManager = new ConfigManager(this, DefaultConfigValues.getConfig(), "config.json");
         this.configManager.reloadConfig();
@@ -37,10 +54,48 @@ public class AccessControl extends Plugin {
         this.playerCacheManager = new PlayerCacheManager(this);
         this.maintenanceManager = new MaintenanceManager(this);
 
+        // LISTENERS AND COMMANDS
+
         this.getProxy().getPluginManager().registerListener(this, new EventListener(this));
         this.getProxy().getPluginManager().registerCommand(this, new ACCommand(this));
 
+        // REPEATING TASKS
+
+        if (this.getConfigManager().getConfig().optJSONObject("enforce", new JSONObject()).optBoolean("lockdown", true) || this.getConfigManager().getConfig().optJSONObject("enforce", new JSONObject()).optBoolean("maintenance", false) || this.getConfigManager().getConfig().optJSONObject("enforce", new JSONObject()).optBoolean("bans", false)) {
+
+            int time = this.getConfigManager().getConfig().optJSONObject("enforce", new JSONObject()).optInt("time", 60);
+
+            if (time <= 0 || time > 3600) {
+                time = 60;
+            }
+
+            this.getProxy().getScheduler().schedule(this, () -> {
+
+                for (ProxiedPlayer player : List.copyOf(this.getProxy().getPlayers())) {
+                    if (player != null) {
+
+                        if (this.getConfigManager().getConfig().optJSONObject("enforce", new JSONObject()).optBoolean("lockdown", true) && this.accessControl.isLockdown() && !player.hasPermission(this.getConfigManager().getConfig().optJSONObject("permissions", new JSONObject()).optString("bypassLockdown", "accesscontrol.bypass.lockdown"))) {
+                            player.disconnect(this.getConfigManager().getConfig().optJSONObject("disconnectScreens", new JSONObject()).optString("lockdown", "This network is currently under lockdown"));
+                            continue;
+                        }
+
+                        if (this.getConfigManager().getConfig().optJSONObject("enforce", new JSONObject()).optBoolean("maintenance", true) && this.getMaintenanceManager().getMaintenanceStatus() && !player.hasPermission(this.getConfigManager().getConfig().optJSONObject("permissions", new JSONObject()).optString("bypassMaintenance", "accesscontrol.bypass.maintenance"))) {
+                            player.disconnect(this.getConfigManager().getConfig().optJSONObject("disconnectScreens", new JSONObject()).optString("maintenance", "This network is currently under maintenance"));
+                            continue;
+                        }
+
+                    }
+                }
+
+            }, 0, time, TimeUnit.SECONDS);
+
+        }
+
+        // STATIC REFERENCE
+
         accessControl = this;
+
+        // FINISHED ENABLING MESSAGE
 
         this.getLogger().info("BungeeAccessControl " + AccessControl.VERSION + " by jandie1505 was successfully enabled");
     }
