@@ -78,7 +78,7 @@ public class AccessControl extends Plugin {
                     }
 
                     if (this.getConfigManager().getConfig().optJSONObject("enforce", new JSONObject()).optBoolean("maintenance", true) && this.getMaintenanceManager().getMaintenanceStatus() && !player.hasPermission(this.getConfigManager().getConfig().optJSONObject("permissions", new JSONObject()).optString("bypassMaintenance", "accesscontrol.bypass.maintenance"))) {
-                        player.disconnect(this.accessControl.getMaintenanceManager().generateMaintenanceScreen());
+                        player.disconnect(this.getMaintenanceManager().generateMaintenanceScreen());
                         continue;
                     }
 
