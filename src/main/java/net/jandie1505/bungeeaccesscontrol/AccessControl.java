@@ -61,35 +61,39 @@ public class AccessControl extends Plugin {
 
         // REPEATING TASKS
 
-        if (this.getConfigManager().getConfig().optJSONObject("enforce", new JSONObject()).optBoolean("lockdown", true) || this.getConfigManager().getConfig().optJSONObject("enforce", new JSONObject()).optBoolean("maintenance", false) || this.getConfigManager().getConfig().optJSONObject("enforce", new JSONObject()).optBoolean("bans", false)) {
+        int time = this.getConfigManager().getConfig().optJSONObject("enforce", new JSONObject()).optInt("time", 60);
 
-            int time = this.getConfigManager().getConfig().optJSONObject("enforce", new JSONObject()).optInt("time", 60);
+        if (time <= 0 || time > 3600) {
+            time = 60;
+        }
 
-            if (time <= 0 || time > 3600) {
-                time = 60;
+        this.getProxy().getScheduler().schedule(this, () -> {
+
+            for (ProxiedPlayer player : List.copyOf(this.getProxy().getPlayers())) {
+                if (player != null) {
+
+                    if (this.isLockdown() && !player.hasPermission(this.getConfigManager().getConfig().optJSONObject("permissions", new JSONObject()).optString("bypassLockdown", "accesscontrol.bypass.lockdown"))) {
+                        player.disconnect(this.getConfigManager().getConfig().optJSONObject("disconnectScreens", new JSONObject()).optString("lockdown", "This network is currently under lockdown"));
+                        continue;
+                    }
+
+                    if (this.getConfigManager().getConfig().optJSONObject("enforce", new JSONObject()).optBoolean("maintenance", true) && this.getMaintenanceManager().getMaintenanceStatus() && !player.hasPermission(this.getConfigManager().getConfig().optJSONObject("permissions", new JSONObject()).optString("bypassMaintenance", "accesscontrol.bypass.maintenance"))) {
+                        player.disconnect(this.getConfigManager().getConfig().optJSONObject("disconnectScreens", new JSONObject()).optString("maintenance", "This network is currently under maintenance"));
+                        continue;
+                    }
+
+                    if (this.getConfigManager().getConfig().optJSONObject("enforce", new JSONObject()).optBoolean("bans", true) && !player.hasPermission(this.getConfigManager().getConfig().optJSONObject("permissions", new JSONObject()).optString("unbannable", "accesscontrol.unbannable"))) {
+                        Ban ban = this.getBanManager().getLongestBan(player.getUniqueId());
+
+                        if (ban != null) {
+                            player.disconnect(this.getBanManager().generateBanScreen(ban));
+                        }
+                    }
+
+                }
             }
 
-            this.getProxy().getScheduler().schedule(this, () -> {
-
-                for (ProxiedPlayer player : List.copyOf(this.getProxy().getPlayers())) {
-                    if (player != null) {
-
-                        if (this.getConfigManager().getConfig().optJSONObject("enforce", new JSONObject()).optBoolean("lockdown", true) && this.accessControl.isLockdown() && !player.hasPermission(this.getConfigManager().getConfig().optJSONObject("permissions", new JSONObject()).optString("bypassLockdown", "accesscontrol.bypass.lockdown"))) {
-                            player.disconnect(this.getConfigManager().getConfig().optJSONObject("disconnectScreens", new JSONObject()).optString("lockdown", "This network is currently under lockdown"));
-                            continue;
-                        }
-
-                        if (this.getConfigManager().getConfig().optJSONObject("enforce", new JSONObject()).optBoolean("maintenance", true) && this.getMaintenanceManager().getMaintenanceStatus() && !player.hasPermission(this.getConfigManager().getConfig().optJSONObject("permissions", new JSONObject()).optString("bypassMaintenance", "accesscontrol.bypass.maintenance"))) {
-                            player.disconnect(this.getConfigManager().getConfig().optJSONObject("disconnectScreens", new JSONObject()).optString("maintenance", "This network is currently under maintenance"));
-                            continue;
-                        }
-
-                    }
-                }
-
-            }, 0, time, TimeUnit.SECONDS);
-
-        }
+        }, 0, time, TimeUnit.SECONDS);
 
         // STATIC REFERENCE
 
