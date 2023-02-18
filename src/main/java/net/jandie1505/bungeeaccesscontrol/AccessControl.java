@@ -35,7 +35,7 @@ public class AccessControl extends Plugin {
         this.databaseManager = new MySQLDatabaseManager(this);
         this.banManager = new BanManager(this);
         this.playerCacheManager = new PlayerCacheManager(this);
-        this.maintenanceManager = maintenanceManager;
+        this.maintenanceManager = new MaintenanceManager(this);
 
         this.getProxy().getPluginManager().registerListener(this, new EventListener(this));
         this.getProxy().getPluginManager().registerCommand(this, new ACCommand(this));
