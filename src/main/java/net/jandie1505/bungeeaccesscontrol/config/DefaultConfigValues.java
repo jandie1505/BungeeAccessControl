@@ -22,7 +22,7 @@ public final class DefaultConfigValues {
         JSONObject disconnectScreensConfig = new JSONObject();
         disconnectScreensConfig.put("lockdown", "This network is currently under lockdown");
         disconnectScreensConfig.put("maintenance", "This network is currently under maintenance");
-        disconnectScreensConfig.put("banned", "You are permanently banned!\\nReason: {reason}\\nUntil: {until}\\nDuration: {duration}");
+        disconnectScreensConfig.put("banScreen", "default");
         config.put("disconnectScreens", disconnectScreensConfig);
 
         JSONObject permissionsConfig = new JSONObject();

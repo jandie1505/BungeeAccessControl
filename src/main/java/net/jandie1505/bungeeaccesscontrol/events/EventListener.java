@@ -40,36 +40,10 @@ public class EventListener implements Listener {
         }
 
         if (!event.getPlayer().hasPermission(this.accessControl.getConfigManager().getConfig().optJSONObject("permissions", new JSONObject()).optString("unbannable", "accesscontrol.unbannable"))) {
-            Ban usedBan = this.accessControl.getBanManager().getLongestBan(event.getPlayer().getUniqueId());
+            Ban ban = this.accessControl.getBanManager().getLongestBan(event.getPlayer().getUniqueId());
 
-            if (usedBan != null) {
-
-                try {
-
-                    String untilString;
-                    String durationString;
-
-                    if (usedBan.getEndTime() == null) {
-                        untilString = this.accessControl.getConfigManager().getConfig().optJSONObject("dateTime", new JSONObject()).optString("permanentTime", "permanent");
-                        durationString = this.accessControl.getConfigManager().getConfig().optJSONObject("dateTime", new JSONObject()).optString("permanentTime", "permanent");
-                    } else {
-                        untilString = Utilities.createTimeString(usedBan.getEndTime(), this.accessControl.getConfigManager().getConfig().optJSONObject("dateTime", new JSONObject()).optString("datetime", "dd.MM.yyyy HH:mm:ss"));
-                        durationString = Utilities.createRemainingTime((usedBan.getEndTime() - Instant.now().getEpochSecond()), this.accessControl.getConfigManager().getConfig().optJSONObject("dateTime", new JSONObject()).optString("remaining", "{days}d, {hours}h, {minutes}m, {seconds}s"));
-                    }
-
-                    event.getPlayer().disconnect(Utilities.replacePlaceholders(
-                            this.accessControl.getConfigManager().getConfig().optJSONObject("disconnectScreens", new JSONObject()).optString("permanentlyBanned", "You are permanently banned\n--- CANNOT GET BAN SCREEN ---"),
-                            Map.of(
-                                    "reason", usedBan.getReason(),
-                                    "until", untilString,
-                                    "duration", durationString
-                            )
-                    ));
-
-                } catch (Exception e) {
-                    event.getPlayer().disconnect("You have been banned.\nThere was an error to get additional information.");
-                }
-
+            if (ban != null) {
+                event.getPlayer().disconnect(this.accessControl.getBanManager().generateBanScreen(ban));
             }
         }
 

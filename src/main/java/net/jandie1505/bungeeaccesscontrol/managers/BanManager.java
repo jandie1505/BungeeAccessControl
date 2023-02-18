@@ -3,20 +3,24 @@ package net.jandie1505.bungeeaccesscontrol.managers;
 import net.jandie1505.bungeeaccesscontrol.AccessControl;
 import net.jandie1505.bungeeaccesscontrol.database.data.BanData;
 import net.jandie1505.bungeeaccesscontrol.managers.data.Ban;
+import net.jandie1505.bungeeaccesscontrol.managers.data.BanScreen;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class BanManager {
     private final AccessControl accessControl;
+    private final Map<String, BanScreen> banScreens;
+    public static final BanScreen DEFAULT_BAN_SCREEN = ban -> "You have been banned from the network!";
 
     public BanManager(AccessControl accessControl) {
         this.accessControl = accessControl;
+        this.banScreens = new HashMap<>();
     }
+
+     // BAN MANAGEMENT
 
     /**
      * Ban a player.
@@ -233,6 +237,11 @@ public class BanManager {
         return this.accessControl.getDatabaseManager().clearBans(player);
     }
 
+    /**
+     * Get the longest ban.
+     * @param player player uuid
+     * @return longest ban of the player
+     */
     public Ban getLongestBan(UUID player) {
         List<Ban> activeBans = new ArrayList<>(this.accessControl.getBanManager().getActiveBans(player));
 
@@ -242,6 +251,80 @@ public class BanManager {
             return activeBans.get(activeBans.size() - 1);
         } else {
             return null;
+        }
+    }
+
+    // BAN SCREENS
+
+    /**
+     * Register a ban screen
+     * @param name name of the ban screen
+     * @param banScreen ban screen
+     * @return success
+     */
+    public boolean registerBanScreen(String name, BanScreen banScreen) {
+        if (name != null && banScreen != null && this.banScreens.containsKey(name) && !name.equalsIgnoreCase("default")) {
+            this.banScreens.put(name, banScreen);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Return an unmodifiable copy of all ban screens
+     * @return map of all ban screens
+     */
+    public Map<String, BanScreen> getBanScreens() {
+        Map<String, BanScreen> map = new HashMap<>(this.banScreens);
+        map.put("default", BanManager.DEFAULT_BAN_SCREEN);
+        return Map.copyOf(map);
+    }
+
+    /**
+     * Get a ban screen with a specific name
+     * @param name name of the ban screen
+     * @return ban screen
+     */
+    public BanScreen getBanScreen(String name) {
+        if (name.equalsIgnoreCase("default") && !this.banScreens.containsKey(name)) {
+            return BanManager.DEFAULT_BAN_SCREEN;
+        } else {
+            return this.banScreens.get(name);
+        }
+    }
+
+    /**
+     * Remove a ban screen
+     * @param name name of the ban screen
+     * @return removed ban screen
+     */
+    public BanScreen removeBanScreen(String name) {
+        return this.banScreens.remove(name);
+    }
+
+    /**
+     * Get the ban screen which is currently enabled
+     * @return currently enabled ban screen
+     */
+    public BanScreen getEnabledBanScreen() {
+        return this.getBanScreen(this.accessControl.getConfigManager().getConfig().optJSONObject("disconnectScreens", new JSONObject()).optString("banScreen", "default"));
+    }
+
+    /**
+     * Get the finished ban screen string.
+     * @param ban ban
+     * @return finished ban screen
+     */
+    public String generateBanScreen(Ban ban) {
+        try {
+            return this.getEnabledBanScreen().getBanScreen(ban);
+        } catch (Exception e) {
+            try {
+                return BanManager.DEFAULT_BAN_SCREEN.getBanScreen(ban);
+            } catch (Exception e2) {
+                return "";
+            }
         }
     }
 }
