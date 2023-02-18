@@ -601,7 +601,7 @@ public class ACCommand extends Command implements TabExecutor {
                                         String name = this.accessControl.getPlayerCacheManager().getCachedPlayer(UUID.fromString(args[2]));
 
                                         if (name != null) {
-                                            sender.sendMessage("Name of UUID + " + args[2] + ": " + name);
+                                            sender.sendMessage("Name of UUID " + args[2] + ": " + name);
                                         } else {
                                             sender.sendMessage("Cached uuid not found");
                                         }
