@@ -28,6 +28,7 @@ public class AccessControl extends Plugin {
     private BanManager banManager;
     private PlayerCacheManager playerCacheManager;
     private MaintenanceManager maintenanceManager;
+    private AccessControlAPI accessControlAPI;
     private boolean lockdown;
 
     @Override
@@ -49,6 +50,7 @@ public class AccessControl extends Plugin {
         this.banManager = new BanManager(this);
         this.playerCacheManager = new PlayerCacheManager(this);
         this.maintenanceManager = new MaintenanceManager(this);
+        this.accessControlAPI = new AccessControlAPI(this);
 
         // LISTENERS AND COMMANDS
 
@@ -131,9 +133,17 @@ public class AccessControl extends Plugin {
         return this.maintenanceManager;
     }
 
+    public AccessControlAPI getAccessControlAPI() {
+        return this.accessControlAPI;
+    }
+
     // STATIC
 
     public static AccessControl getInstance() {
         return accessControl;
+    }
+
+    public static AccessControlAPI getAPI() {
+        return AccessControl.getInstance().getAccessControlAPI();
     }
 }
