@@ -69,7 +69,7 @@ public class AccessControl extends Plugin {
                 if (player != null) {
 
                     if (this.isLockdown() && !player.hasPermission(this.getConfigManager().getConfig().optJSONObject("permissions", new JSONObject()).optString("bypassLockdown", "accesscontrol.bypass.lockdown"))) {
-                        player.disconnect(this.getConfigManager().getConfig().optJSONObject("disconnectScreens", new JSONObject()).optString("lockdown", "This network is currently under lockdown"));
+                        player.disconnect(this.getConfigManager().getConfig().optJSONObject("disconnectScreens", new JSONObject()).optString("lockdownMessage", "This network is currently under lockdown"));
                         continue;
                     }
 
@@ -83,6 +83,7 @@ public class AccessControl extends Plugin {
 
                         if (ban != null) {
                             player.disconnect(this.getBanManager().generateBanScreen(ban));
+                            continue;
                         }
                     }
 

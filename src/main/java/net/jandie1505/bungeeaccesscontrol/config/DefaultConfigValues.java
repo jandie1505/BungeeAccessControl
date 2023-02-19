@@ -20,7 +20,7 @@ public final class DefaultConfigValues {
         config.put("mysql", mysqlConfig);
 
         JSONObject disconnectScreensConfig = new JSONObject();
-        disconnectScreensConfig.put("lockdown", "This network is currently under lockdown");
+        disconnectScreensConfig.put("lockdownMessage", "This network is currently under lockdown");
         disconnectScreensConfig.put("maintenanceScreen", "default");
         disconnectScreensConfig.put("banScreen", "default");
         config.put("disconnectScreens", disconnectScreensConfig);

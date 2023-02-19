@@ -22,7 +22,7 @@ public class EventListener implements Listener {
             if (event.getPlayer().hasPermission(this.accessControl.getConfigManager().getConfig().optJSONObject("permissions", new JSONObject()).optString("bypassLockdown", "accesscontrol.bypass.lockdown"))) {
                 event.getPlayer().sendMessage("§cAutomatic network lockdown active. You are bypassing.");
             } else {
-                event.getPlayer().disconnect(this.accessControl.getConfigManager().getConfig().optJSONObject("disconnectScreens", new JSONObject()).optString("lockdown", "This network is currently under lockdown"));
+                event.getPlayer().disconnect(this.accessControl.getConfigManager().getConfig().optJSONObject("disconnectScreens", new JSONObject()).optString("lockdownMessage", "This network is currently under lockdown"));
                 return;
             }
 
