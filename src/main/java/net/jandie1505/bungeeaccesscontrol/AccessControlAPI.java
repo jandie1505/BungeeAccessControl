@@ -22,4 +22,8 @@ public class AccessControlAPI {
     public PlayerCacheManager getPlayerCacheManager() {
         return this.accessControl.getPlayerCacheManager();
     }
+
+    public AccessControl getAccessControl() {
+        return this.accessControl;
+    }
 }
