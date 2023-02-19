@@ -44,10 +44,10 @@ public class BanManager {
         ProxiedPlayer proxiedPlayer = this.accessControl.getProxy().getPlayer(playerId);
 
         if (proxiedPlayer != null) {
-            BanData banData = this.accessControl.getDatabaseManager().getBan(banId);
+            Ban ban = this.getBan(banId);
 
-            if (banData != null) {
-                proxiedPlayer.disconnect(this.accessControl.getConfigManager().getConfig().optJSONObject("disconnectScreens", new JSONObject()).optString("lockdown", "This network is currently under maintenance"));
+            if (ban != null) {
+                proxiedPlayer.disconnect(this.accessControl.getBanManager().generateBanScreen(ban));
             } else {
                 proxiedPlayer.disconnect("You have been banned.\nThere was an error to get additional information.");
             }

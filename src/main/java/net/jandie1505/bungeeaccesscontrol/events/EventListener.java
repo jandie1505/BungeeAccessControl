@@ -17,6 +17,9 @@ public class EventListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPostLogin(PostLoginEvent event) {
+
+        // CHECK FOR LOCKDOWN
+
         if (this.accessControl.isLockdown()) {
 
             if (event.getPlayer().hasPermission(this.accessControl.getConfigManager().getConfig().optJSONObject("permissions", new JSONObject()).optString("bypassLockdown", "accesscontrol.bypass.lockdown"))) {
@@ -28,21 +31,34 @@ public class EventListener implements Listener {
 
         }
 
+        // CHECK FOR MAINTENANCE
+
         if (this.accessControl.getMaintenanceManager().getMaintenanceStatus() && !event.getPlayer().hasPermission(this.accessControl.getConfigManager().getConfig().optJSONObject("permissions", new JSONObject()).optString("bypassMaintenance", "accesscontrol.bypass.maintenance"))) {
             event.getPlayer().disconnect(this.accessControl.getMaintenanceManager().generateMaintenanceScreen());
             return;
         }
+
+        // CHECK IF THE PLAYER IS BANNED
 
         if (!event.getPlayer().hasPermission(this.accessControl.getConfigManager().getConfig().optJSONObject("permissions", new JSONObject()).optString("unbannable", "accesscontrol.unbannable"))) {
             Ban ban = this.accessControl.getBanManager().getLongestBan(event.getPlayer().getUniqueId());
 
             if (ban != null) {
                 event.getPlayer().disconnect(this.accessControl.getBanManager().generateBanScreen(ban));
+                return;
             }
         }
 
+        // CACHE PLAYER
+
         if (this.accessControl.getConfigManager().getConfig().optBoolean("playerCaching", false)) {
             this.accessControl.getPlayerCacheManager().cachePlayer(event.getPlayer().getUniqueId(), event.getPlayer().getName());
+        }
+
+        // UNBANNABLE MESSAGE
+
+        if (event.getPlayer().hasPermission(this.accessControl.getConfigManager().getConfig().optJSONObject("permissions", new JSONObject()).optString("unbannable", "accesscontrol.unbannable")) && this.accessControl.getBanManager().getLongestBan(event.getPlayer().getUniqueId()) != null) {
+            event.getPlayer().sendMessage("§cYou are currently banned, but you have the bypass permission.");
         }
     }
 }
