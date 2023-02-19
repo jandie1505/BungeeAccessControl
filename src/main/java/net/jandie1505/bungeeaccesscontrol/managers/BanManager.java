@@ -265,6 +265,7 @@ public class BanManager {
     public boolean registerBanScreen(String name, BanScreen banScreen) {
         if (name != null && banScreen != null && this.banScreens.containsKey(name) && !name.equalsIgnoreCase("default")) {
             this.banScreens.put(name, banScreen);
+            this.accessControl.getLogger().info("Ban screen with name " + name + " was successfully registered");
             return true;
         } else {
             return false;
@@ -300,7 +301,13 @@ public class BanManager {
      * @return removed ban screen
      */
     public BanScreen removeBanScreen(String name) {
-        return this.banScreens.remove(name);
+        BanScreen removedScreen = this.banScreens.remove(name);
+
+        if (removedScreen != null) {
+            this.accessControl.getLogger().info("Ban screen " + name + " was successfully removed");
+        }
+
+        return removedScreen;
     }
 
     /**
@@ -321,6 +328,7 @@ public class BanManager {
             return this.getEnabledBanScreen().getBanScreen(ban);
         } catch (Exception e) {
             try {
+                this.accessControl.getLogger().warning("Exception in ban screen: EXCEPTION=" + e + ";STACKTRACE=" + Arrays.toString(e.getStackTrace()) + ";MESSAGE=" + e.getMessage());
                 return BanManager.DEFAULT_BAN_SCREEN.getBanScreen(ban);
             } catch (Exception e2) {
                 return "";

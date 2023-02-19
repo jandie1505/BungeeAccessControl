@@ -109,7 +109,6 @@ public class AccessControl extends Plugin {
 
     public void setLockdown(boolean lockdown) {
         this.lockdown = lockdown;
-
         this.getLogger().info("Lockdown status updated: " + this.lockdown);
     }
 
