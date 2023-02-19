@@ -71,7 +71,7 @@ public class ACCommand extends Command implements TabExecutor {
                                 }
 
                                 for (Ban ban : bans) {
-                                    reply = reply + "id=" + ban.getId() + ";player=" + ban.getPlayer().toString() + ";endTime=" + ban.getEndTime() + "cancelled=" + ban.isCancelled() + "\n";
+                                    reply = reply + "id=" + ban.getId() + ";player=" + ban.getPlayer().toString() + ";endTime=" + ban.getEndTime() + ";cancelled=" + ban.isCancelled() + "\n";
                                 }
 
                                 sender.sendMessage(reply);
