@@ -56,7 +56,7 @@ public class ACCommand extends Command implements TabExecutor {
 
                                 if (args.length > 2) {
 
-                                    UUID target = Utilities.getPlayerIdFromString(this.accessControl, args[2]);
+                                    UUID target = this.accessControl.getPlayerCacheManager().getPlayerUUIDFromString(args[2]);
 
                                     if (target == null) {
                                         sender.sendMessage("Player not found");
@@ -114,7 +114,7 @@ public class ACCommand extends Command implements TabExecutor {
 
                                 if (args.length > 2) {
 
-                                    UUID player = Utilities.getPlayerIdFromString(this.accessControl, args[2]);
+                                    UUID player = this.accessControl.getPlayerCacheManager().getPlayerUUIDFromString(args[2]);
 
                                     if (player != null) {
 
@@ -195,7 +195,7 @@ public class ACCommand extends Command implements TabExecutor {
 
                                             if (args[3].equalsIgnoreCase("player")) {
 
-                                                UUID player = Utilities.getPlayerIdFromString(this.accessControl, args[4]);
+                                                UUID player = this.accessControl.getPlayerCacheManager().getPlayerUUIDFromString(args[4]);
 
                                                 if (player != null) {
                                                     ban.setPlayer(player);
